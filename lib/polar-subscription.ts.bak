@@ -1,0 +1,402 @@
+import type { Order } from "@polar-sh/sdk/models/components/order.js";
+import type { OrderSubscription } from "@polar-sh/sdk/models/components/ordersubscription.js";
+import type { Subscription } from "@polar-sh/sdk/models/components/subscription.js";
+import { getPolarClient } from "@/lib/polar";
+import { createAdminClient } from "@/lib/supabase/admin";
+
+function metadataUserId(
+  meta: Record<string, unknown> | undefined | null,
+): string | null {
+  if (!meta) {
+    return null;
+  }
+  const id = meta.userId ?? meta.user_id;
+  if (typeof id === "string" && id.trim()) {
+    return id.trim();
+  }
+  return null;
+}
+
+/** Map a Polar subscription payload to the Supabase user id when present inline. */
+export function resolveUserIdFromSubscription(
+  subscription: Subscription,
+): string | null {
+  const external = subscription.customer?.externalId;
+  if (typeof external === "string" && external.trim()) {
+    return external.trim();
+  }
+  return (
+    metadataUserId(subscription.metadata as Record<string, unknown>) ??
+    metadataUserId(subscription.customer?.metadata as Record<string, unknown>)
+  );
+}
+
+/** Resolve user id from payload or stored polar ids on profiles (revoke payloads often omit externalId). */
+export async function resolveUserIdForSubscription(
+  subscription: Subscription,
+): Promise<string | null> {
+  const fromPayload = resolveUserIdFromSubscription(subscription);
+  if (fromPayload) {
+    return fromPayload;
+  }
+
+  const supabase = createAdminClient();
+
+  const { data: bySubscription } = await supabase
+    .from("profiles")
+    .select("id")
+    .eq("polar_subscription_id", subscription.id)
+    .maybeSingle();
+
+  if (bySubscription?.id) {
+    return bySubscription.id;
+  }
+
+  if (subscription.customerId) {
+    const { data: byCustomer } = await supabase
+      .from("profiles")
+      .select("id")
+      .eq("polar_customer_id", subscription.customerId)
+      .maybeSingle();
+
+    if (byCustomer?.id) {
+      return byCustomer.id;
+    }
+  }
+
+  return null;
+}
+
+export function resolveUserIdFromOrder(order: Order): string | null {
+  const external = order.customer?.externalId;
+  if (typeof external === "string" && external.trim()) {
+    return external.trim();
+  }
+  return (
+    metadataUserId(order.metadata as Record<string, unknown>) ??
+    metadataUserId(order.customer?.metadata as Record<string, unknown>)
+  );
+}
+
+export async function resolveUserIdForOrder(
+  order: Order,
+): Promise<string | null> {
+  const fromPayload = resolveUserIdFromOrder(order);
+  if (fromPayload) {
+    return fromPayload;
+  }
+
+  const supabase = createAdminClient();
+
+  if (order.customer?.id) {
+    const { data: byCustomer } = await supabase
+      .from("profiles")
+      .select("id")
+      .eq("polar_customer_id", order.customer.id)
+      .maybeSingle();
+    if (byCustomer?.id) {
+      return byCustomer.id;
+    }
+  }
+
+  if (order.customer?.email) {
+    const { data: byEmail } = await supabase
+      .from("profiles")
+      .select("id")
+      .eq("email", order.customer.email)
+      .maybeSingle();
+    if (byEmail?.id) {
+      return byEmail.id;
+    }
+  }
+
+  if (order.subscriptionId) {
+    const { data: bySubscription } = await supabase
+      .from("profiles")
+      .select("id")
+      .eq("polar_subscription_id", order.subscriptionId)
+      .maybeSingle();
+    if (bySubscription?.id) {
+      return bySubscription.id;
+    }
+  }
+
+  return null;
+}
+
+function subscriptionGrantsPremium(subscription: Subscription): boolean {
+  if (subscription.status !== "active" && subscription.status !== "trialing") {
+    return false;
+  }
+  if (subscription.endedAt && new Date(subscription.endedAt) <= new Date()) {
+    return false;
+  }
+  return true;
+}
+
+function subscriptionRevokedOrEnded(subscription: Subscription): boolean {
+  if (subscription.status === "unpaid") {
+    return true;
+  }
+
+  if (subscription.endedAt && new Date(subscription.endedAt) <= new Date()) {
+    return true;
+  }
+
+  if (subscription.status === "canceled") {
+    if (
+      subscription.cancelAtPeriodEnd &&
+      subscription.endsAt &&
+      new Date(subscription.endsAt) > new Date()
+    ) {
+      return false;
+    }
+    return true;
+  }
+
+  return false;
+}
+
+export async function setProfileSubscription(
+  userId: string,
+  active: boolean,
+  subscriptionId: string | null,
+  customerId: string | null,
+): Promise<void> {
+  const supabase = createAdminClient();
+  
+  // 👈 Always update the subscription ID field to overwrite stale/expired IDs
+  const updatePayload: Record<string, any> = {
+    subscription_active: active,
+    polar_subscription_id: subscriptionId, 
+  };
+
+  if (customerId !== null) {
+    updatePayload.polar_customer_id = customerId;
+  }
+
+  const { data, error } = await supabase
+    .from("profiles")
+    .update(updatePayload)
+    .eq("id", userId)
+    .select("id")
+    .maybeSingle();
+
+  if (error) {
+    throw new Error(`Failed to update profile subscription: ${error.message}`);
+  }
+  if (!data) {
+    throw new Error(`No profile found for user id ${userId}`);
+  }
+}
+
+export async function revokePremiumFromSubscription(
+  subscription: Subscription,
+): Promise<boolean> {
+  const userId = await resolveUserIdForSubscription(subscription);
+  if (!userId) {
+    console.warn("[polar] revoke: could not resolve user", {
+      subscriptionId: subscription.id,
+      customerId: subscription.customerId,
+    });
+    return false;
+  }
+
+  await setProfileSubscription(userId, false, null, subscription.customerId);
+  return true;
+}
+
+function orderSubscriptionGrantsPremium(
+  subscription: OrderSubscription,
+): boolean {
+  if (subscription.status !== "active" && subscription.status !== "trialing") {
+    return false;
+  }
+  if (subscription.endedAt && new Date(subscription.endedAt) <= new Date()) {
+    return false;
+  }
+  return true;
+}
+
+function orderGrantsPremium(order: Order): boolean {
+  if (!order.paid) {
+    return false;
+  }
+
+  if (order.subscription) {
+    return orderSubscriptionGrantsPremium(order.subscription);
+  }
+
+  return true;
+}
+
+export async function activateFromSubscription(
+  subscription: Subscription,
+): Promise<boolean> {
+  const userId = await resolveUserIdForSubscription(subscription);
+  if (!userId) {
+    console.warn("[polar] activate: could not resolve user", {
+      subscriptionId: subscription.id,
+      customerId: subscription.customerId,
+    });
+    return false;
+  }
+
+  if (subscriptionRevokedOrEnded(subscription)) {
+    await setProfileSubscription(userId, false, null, subscription.customerId);
+    return false;
+  }
+
+  if (!subscriptionGrantsPremium(subscription)) {
+    return false;
+  }
+
+  await setProfileSubscription(
+    userId,
+    true,
+    subscription.id,
+    subscription.customerId,
+  );
+  return true;
+}
+
+export async function activateFromOrder(order: Order): Promise<boolean> {
+  const userId = await resolveUserIdForOrder(order);
+  if (!userId) {
+    console.warn("[polar] order.paid: could not resolve user", {
+      orderId: order.id,
+      customerId: order.customer?.id,
+      customerExternalId: order.customer?.externalId,
+    });
+    return false;
+  }
+
+  if (!orderGrantsPremium(order)) {
+    return false;
+  }
+
+  await setProfileSubscription(
+    userId,
+    true,
+    order.subscription?.id ?? "lifetime", // 👈 Change null to "lifetime"
+    order.customer?.id ?? null,
+  );
+  return true;
+}
+
+/** Apply subscription webhook — revoked always removes premium; updated respects cancel-at-period-end. */
+export async function applySubscriptionWebhook(
+  subscription: Subscription,
+  event: "active" | "created" | "updated" | "revoked",
+): Promise<void> {
+  if (event === "revoked") {
+    await revokePremiumFromSubscription(subscription);
+    return;
+  }
+
+  if (subscriptionRevokedOrEnded(subscription)) {
+    await revokePremiumFromSubscription(subscription);
+    return;
+  }
+
+  await activateFromSubscription(subscription);
+}
+
+/** Apply order webhook — handles order.paid events for one-time or subscription initialization. */
+export async function applyOrderWebhook(
+  order: Order,
+  event: "created" | "paid",
+): Promise<void> {
+  if (event === "paid") {
+    await activateFromOrder(order);
+  }
+}
+
+/** Pull active subscriptions from Polar for this user (fallback after checkout). */
+export async function syncSubscriptionFromPolar(
+  userId: string
+): Promise<{ active: boolean; subscriptionId: string | null }> {
+  const polar = getPolarClient();
+
+  // 1. Fetch local DB state
+  const supabase = createAdminClient();
+  const { data: profile } = await supabase
+    .from("profiles")
+    .select("subscription_active, polar_subscription_id")
+    .eq("id", userId)
+    .single();
+
+  // If client is missing, fall back safely to local state
+  if (!polar) {
+    return {
+      active: profile?.subscription_active ?? false,
+      subscriptionId: profile?.polar_subscription_id ?? null,
+    };
+  }
+
+  // 2. Local Database Lifetime Guard
+  // If they are already marked active with 'lifetime', don't touch them!
+  if (profile?.subscription_active && profile.polar_subscription_id === "lifetime") {
+    return { active: true, subscriptionId: "lifetime" };
+  }
+
+  // 3. CHECK ONE-TIME ORDERS FIRST (For Lifetime Users)
+  try {
+    // We list orders matching this user's ID
+    const orderPages = await polar.orders.list({
+      externalCustomerId: userId,
+      limit: 10,
+    });
+
+    for await (const page of orderPages) {
+      // Check if they have a completed order matching a lifetime product
+      const productName = page.product?.name?.toLowerCase() || "";
+      if (productName.includes("lifetime") || productName.includes("one-time")) {
+        // Found a valid lifetime purchase! Upgrade them and exit early.
+        await setProfileSubscription(userId, true, "lifetime", "lifetime");
+        return { active: true, subscriptionId: "lifetime" };
+      }
+    }
+  } catch (error) {
+    console.error("Error checking Polar orders:", error);
+  }
+
+  // 4. CHECK RECURRING SUBSCRIPTIONS (For Subscription Users)
+  let activeSub: any = null;
+  try {
+    const subPages = await polar.subscriptions.list({
+      externalCustomerId: userId,
+      active: true,
+      limit: 10,
+    });
+
+    for await (const page of subPages) {
+      // Ensure the object actually has properties we expect
+      if (page && page.id) {
+        activeSub = page;
+        break;
+      }
+    }
+  } catch (error) {
+    console.error("Error checking Polar subscriptions:", error);
+    if (profile?.subscription_active) {
+      return { active: true, subscriptionId: profile.polar_subscription_id };
+    }
+  }
+
+  // 5. Evaluate Recurring Subscription
+  if (activeSub && subscriptionGrantsPremium(activeSub)) {
+    const tier = activeSub.tier?.toLowerCase().includes("yearly") ? "yearly" : "monthly";
+    await setProfileSubscription(userId, true, activeSub.id, tier);
+    return { active: true, subscriptionId: activeSub.id };
+  }
+
+  // 6. Secondary local guard before stripping access
+  if (profile?.subscription_active && !profile.polar_subscription_id) {
+    return { active: true, subscriptionId: null };
+  }
+
+  // 7. No active subscription and no lifetime order found anywhere -> Strip access
+  await setProfileSubscription(userId, false, null, null);
+  return { active: false, subscriptionId: null };
+}
