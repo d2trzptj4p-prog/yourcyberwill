@@ -22,10 +22,16 @@ export default function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  const themeMode = process.env.NEXT_PUBLIC_THEME_MODE || "auto";
+  const forceLight = themeMode === "light";
+
   return (
     <html
       lang="en"
-      className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
+      className={`${geistSans.variable} ${geistMono.variable} h-full antialiased ${
+        forceLight ? "light" : ""
+      }`}
+      style={forceLight ? { colorScheme: "light" } : {}}
     >
       <body className="min-h-full flex flex-col">{children}</body>
     </html>

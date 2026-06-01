@@ -293,7 +293,7 @@ export function CheckInSection() {
   }
 
   return (
-    <section className="space-y-6 rounded-2xl border border-zinc-200 p-6 dark:border-zinc-800">
+    <section className="space-y-6 rounded-2xl mb-8 border border-zinc-200 p-6 dark:border-zinc-800">
       <div>
         <h2 className="text-2xl">Check-ins</h2>
         <p className="mt-1 text-sm text-zinc-600 dark:text-zinc-400">

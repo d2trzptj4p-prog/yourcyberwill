@@ -105,6 +105,13 @@ export async function setProfileSubscription(
   subscriptionId: string | null,
   customerId: string | null,
 ): Promise<void> {
+  console.log("[polar] setProfileSubscription called", {
+    userId,
+    active,
+    subscriptionId,
+    customerId,
+  });
+
   const supabase = createAdminClient();
   const { data, error } = await supabase
     .from("profiles")
@@ -116,6 +123,13 @@ export async function setProfileSubscription(
     .eq("id", userId)
     .select("id")
     .maybeSingle();
+
+  console.log("[polar] setProfileSubscription result", {
+    userId,
+    success: !error,
+    error: error?.message,
+    updatedProfileId: data?.id,
+  });
 
   if (error) {
     throw new Error(`Failed to update profile subscription: ${error.message}`);
@@ -198,26 +212,112 @@ export async function syncSubscriptionFromPolar(
     throw new Error("Polar is not configured");
   }
 
-  const pages = await polar.subscriptions.list({
+  // Check for active subscriptions
+  const subscriptionPages = await polar.subscriptions.list({
     externalCustomerId: userId,
     active: true,
     limit: 10,
   });
 
-  let first: Subscription | null = null;
-  for await (const page of pages) {
+  let firstSubscription: Subscription | null = null;
+  for await (const page of subscriptionPages) {
     const items = page.result?.items ?? [];
     if (items.length > 0) {
-      first = items[0]!;
+      firstSubscription = items[0]!;
       break;
     }
   }
 
-  if (!first || !subscriptionGrantsPremium(first)) {
-    await setProfileSubscription(userId, false, null, null);
-    return { active: false, subscriptionId: null };
+  // If we have an active subscription, use it
+  if (firstSubscription && subscriptionGrantsPremium(firstSubscription)) {
+    console.log("[polar-sync] Found active subscription for user", userId);
+    await setProfileSubscription(
+      userId,
+      true,
+      firstSubscription.id,
+      firstSubscription.customerId,
+    );
+    return { active: true, subscriptionId: firstSubscription.id };
   }
 
-  await setProfileSubscription(userId, true, first.id, first.customerId);
-  return { active: true, subscriptionId: first.id };
+  // Check for lifetime purchases (one-time orders)
+  console.log("[polar-sync] No active subscription found, checking for lifetime purchase");
+  const orderPages = await polar.orders.list({
+    externalCustomerId: userId,
+    productBillingType: "one_time",
+    limit: 10,
+  });
+
+  let hasLifetime = false;
+  let lifetimeCustomerId: string | null = null;
+
+  for await (const page of orderPages) {
+    const items = page.result?.items ?? [];
+    for (const order of items) {
+      if (order.paid === true) {
+        hasLifetime = true;
+        lifetimeCustomerId = order.customerId;
+        console.log("[polar-sync] Found paid lifetime order for user", userId);
+        break;
+      }
+    }
+    if (hasLifetime) break;
+  }
+
+  if (hasLifetime) {
+    console.log("[polar-sync] Activating lifetime purchase for user", userId);
+    await setProfileSubscription(userId, true, null, lifetimeCustomerId);
+    return { active: true, subscriptionId: null };
+  }
+
+  // No active subscription or lifetime purchase
+  console.log("[polar-sync] No active subscription or lifetime purchase for user", userId);
+  await setProfileSubscription(userId, false, null, null);
+  return { active: false, subscriptionId: null };
+}
+
+/**
+ * Apply order webhook — one-time purchases grant premium access.
+ * Orders have no recurring billing, so we just check if they're paid.
+ */
+export async function applyOrderWebhook(
+  order: { subscriptionId?: string | null; customerId?: string; id: string },
+  event: "paid",
+): Promise<void> {
+  // Only handle one-time orders (not part of a subscription)
+  if (order.subscriptionId) {
+    console.log("[polar-order] Ignoring order with subscription ID", {
+      orderId: order.id,
+    });
+    return;
+  }
+
+  if (!order.customerId) {
+    console.warn("[polar-order] Order has no customer ID", { orderId: order.id });
+    return;
+  }
+
+  // Find the user by customer ID
+  const supabase = createAdminClient();
+  const { data: profile } = await supabase
+    .from("profiles")
+    .select("id")
+    .eq("polar_customer_id", order.customerId)
+    .maybeSingle();
+
+  if (!profile?.id) {
+    console.warn("[polar-order] No user found for customer", {
+      orderId: order.id,
+      customerId: order.customerId,
+    });
+    return;
+  }
+
+  // Mark user as premium (one-time lifetime purchase)
+  await setProfileSubscription(profile.id, true, null, order.customerId);
+
+  console.log("[polar-order] Activated premium from one-time order", {
+    userId: profile.id,
+    orderId: order.id,
+  });
 }

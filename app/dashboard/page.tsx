@@ -7,9 +7,17 @@ import { SubscriptionSection } from "@/components/subscription-section";
 import { HandWavingIconClient } from "@/components/hand-waving-icon";
 import { getOrCreateProfile } from "@/lib/profile";
 import { syncUserSubscriptionOnLoad } from "@/lib/sync-user-subscription";
+import { handleLifetimePurchase } from "@/lib/handle-lifetime-purchase";
 import { createClient } from "@/lib/supabase/server";
 
-export default async function DashboardPage() {
+type PageProps = {
+  searchParams: Promise<Record<string, string | string[] | undefined>>;
+};
+
+export default async function DashboardPage({ searchParams }: PageProps) {
+  const params = await searchParams;
+  console.log("[dashboard] Page loaded with params:", params);
+  
   const supabase = await createClient();
   const {
     data: { user },
@@ -17,6 +25,20 @@ export default async function DashboardPage() {
 
   if (!user) {
     redirect("/login");
+  }
+
+  // Handle lifetime purchase completion
+  const subscription = Array.isArray(params.subscription)
+    ? params.subscription[0]
+    : params.subscription;
+  const plan = Array.isArray(params.plan) ? params.plan[0] : params.plan;
+  
+  console.log("[dashboard] Parsed params:", { subscription, plan, userId: user.id });
+
+  if (subscription === "success" && plan === "lifetime") {
+    console.log("[dashboard] Activating lifetime purchase for user", user.id);
+    const activated = await handleLifetimePurchase(user.id);
+    console.log("[dashboard] Lifetime purchase activation result:", activated);
   }
 
   await syncUserSubscriptionOnLoad(user.id);
@@ -31,6 +53,11 @@ export default async function DashboardPage() {
     "there";
 
   const isPremium = profile?.subscription_active === true;
+  console.log("[dashboard] Final profile state:", {
+    userId: user.id,
+    isPremium,
+    subscriptionActive: profile?.subscription_active,
+  });
 
   return (
     <div className="mx-auto flex w-full max-w-5xl flex-1 flex-col gap-8 px-6 py-12">
