@@ -102,12 +102,11 @@ Deno.serve(async (req) => {
   const nowIso = now.toISOString();
 
   try {
-    // Find all users with active check-ins who haven't received a reminder yet
+    // Find all users with active check-ins whose deadline hasn't passed
     const { data: usersToNotify, error: queryError } = await supabase
       .from("profiles")
       .select("id, email, full_name, check_in_due_at, check_in_interval_days")
       .eq("check_in_active", true)
-      .eq("reminder_notification_sent", false)
       .not("check_in_due_at", "is", null)
       .gt("check_in_due_at", nowIso) // Only future deadlines (not overdue)
       .order("check_in_due_at", { ascending: true });
@@ -137,11 +136,10 @@ Deno.serve(async (req) => {
       try {
         await sendReminderEmail(user, timeRemainingMs);
 
-        // Mark reminder as sent
+        // Just log the reminder sent, don't mark as sent (so it sends every trigger)
         const { error: updateError } = await supabase
           .from("profiles")
           .update({
-            reminder_notification_sent: true,
             last_reminder_notification_at: nowIso,
           })
           .eq("id", user.id);
