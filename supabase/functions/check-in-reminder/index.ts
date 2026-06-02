@@ -22,17 +22,31 @@ interface ReminderResult {
   user_id: string;
   email_sent: boolean;
   time_remaining_ms: number;
+  percentage_remaining: number;
   error?: string;
 }
 
 function formatTimeRemaining(ms: number): string {
-  const days = Math.floor(ms / (24 * 60 * 60 * 1000));
-  const hours = Math.floor((ms % (24 * 60 * 60 * 1000)) / (60 * 60 * 1000));
+  const months = Math.floor(ms / (30 * 24 * 60 * 60 * 1000));
+  const remainingAfterMonths = ms % (30 * 24 * 60 * 60 * 1000);
   
-  if (days > 0) {
-    return `${days} day${days > 1 ? "s" : ""} and ${hours} hour${hours > 1 ? "s" : ""}`;
-  }
-  return `${hours} hour${hours > 1 ? "s" : ""}`;
+  const days = Math.floor(remainingAfterMonths / (24 * 60 * 60 * 1000));
+  const remainingAfterDays = remainingAfterMonths % (24 * 60 * 60 * 1000);
+  
+  const hours = Math.floor(remainingAfterDays / (60 * 60 * 1000));
+  const remainingAfterHours = remainingAfterDays % (60 * 60 * 1000);
+  
+  const minutes = Math.floor(remainingAfterHours / (60 * 1000));
+  const seconds = Math.floor((remainingAfterHours % (60 * 1000)) / 1000);
+  
+  const parts = [];
+  if (months > 0) parts.push(`${months} month${months > 1 ? "s" : ""}`);
+  if (days > 0) parts.push(`${days} day${days > 1 ? "s" : ""}`);
+  if (hours > 0) parts.push(`${hours} hour${hours > 1 ? "s" : ""}`);
+  if (minutes > 0) parts.push(`${minutes} minute${minutes > 1 ? "s" : ""}`);
+  if (seconds > 0) parts.push(`${seconds} second${seconds > 1 ? "s" : ""}`);
+  
+  return parts.length > 0 ? parts.join(", ") : "0 seconds";
 }
 
 function getUserIntervalMs(intervalDays: number | null): number {
@@ -127,44 +141,56 @@ Deno.serve(async (req) => {
       // Calculate 50% threshold based on user's selected period
       const userIntervalMs = getUserIntervalMs(user.check_in_interval_days);
       const fiftyPercentThreshold = userIntervalMs / 2;
+      const percentageRemaining = Math.round((timeRemainingMs / userIntervalMs) * 100);
 
-      // Only send reminder if less than 50% of time remains
-      if (timeRemainingMs >= fiftyPercentThreshold) {
-        continue;
-      }
+      const shouldRemind = timeRemainingMs >= fiftyPercentThreshold;
 
-      try {
-        await sendReminderEmail(user, timeRemainingMs);
+      // Always add to results to show all checked users
+      if (!shouldRemind) {
+        try {
+          await sendReminderEmail(user, timeRemainingMs);
 
-        // Just log the reminder sent, don't mark as sent (so it sends every trigger)
-        const { error: updateError } = await supabase
-          .from("profiles")
-          .update({
-            last_reminder_notification_at: nowIso,
-          })
-          .eq("id", user.id);
+          // Just log the reminder sent, don't mark as sent (so it sends every trigger)
+          const { error: updateError } = await supabase
+            .from("profiles")
+            .update({
+              last_reminder_notification_at: nowIso,
+            })
+            .eq("id", user.id);
 
-        if (updateError) {
+          if (updateError) {
+            results.push({
+              user_id: user.id,
+              email_sent: false,
+              time_remaining_ms: timeRemainingMs,
+              percentage_remaining: percentageRemaining,
+              error: `Email sent but failed to update db: ${updateError.message}`,
+            });
+          } else {
+            results.push({
+              user_id: user.id,
+              email_sent: true,
+              time_remaining_ms: timeRemainingMs,
+              percentage_remaining: percentageRemaining,
+            });
+          }
+        } catch (e) {
+          const errorMsg = e instanceof Error ? e.message : "Unknown error";
           results.push({
             user_id: user.id,
             email_sent: false,
             time_remaining_ms: timeRemainingMs,
-            error: `Email sent but failed to update db: ${updateError.message}`,
-          });
-        } else {
-          results.push({
-            user_id: user.id,
-            email_sent: true,
-            time_remaining_ms: timeRemainingMs,
+            percentage_remaining: percentageRemaining,
+            error: errorMsg,
           });
         }
-      } catch (e) {
-        const errorMsg = e instanceof Error ? e.message : "Unknown error";
+      } else {
+        // User is above 50%, no reminder needed
         results.push({
           user_id: user.id,
           email_sent: false,
           time_remaining_ms: timeRemainingMs,
-          error: errorMsg,
+          percentage_remaining: percentageRemaining,
         });
       }
     }
