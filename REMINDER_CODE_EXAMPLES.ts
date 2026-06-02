@@ -220,7 +220,7 @@ export async function sendCustomReminder(
     body: JSON.stringify({
       from: RESEND_FROM_EMAIL,
       to: [email],
-      subject: '⏰ Reminder: Complete your Cipherwill check-in',
+      subject: '⏰ Reminder: Complete your yourcyberwill check-in',
       html: `
         <p>Hi ${name},</p>
         <p>Your check-in deadline is approaching. You have <strong>${timeRemaining}</strong> left.</p>

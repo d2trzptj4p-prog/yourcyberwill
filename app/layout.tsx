@@ -13,7 +13,7 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Cipherwill - Secure Digital Legacy",
+  title: "yourcyberwill - Secure Digital Legacy",
   description: "Protect your most important information with end-to-end encrypted storage and secure sharing.",
 };
 

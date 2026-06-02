@@ -33,7 +33,7 @@ File: `supabase/functions/check-in-reminder/index.ts`
 - Current time remaining (formatted: "X days and Y hours")
 - Percentage of time left
 - Call-to-action link to dashboard
-- Professional Cipherwill branding
+- Professional yourcyberwill branding
 
 #### 3. Scheduler (Cron Job)
 File: `supabase/migrations/20260601000001_schedule_check_in_reminder.sql`
@@ -89,7 +89,7 @@ Example email:
 ```
 Hi John Doe,
 
-This is a friendly reminder that your Cipherwill check-in deadline is approaching. 
+This is a friendly reminder that your yourcyberwill check-in deadline is approaching. 
 You have approximately 15 days and 8 hours left to complete your check-in.
 
 Once you check in, your recipients will be notified and can access your vault if 
@@ -97,7 +97,7 @@ anything happens to you. Don't leave them waiting!
 
 [Check In Now] ← Button links to dashboard
 
-— Cipherwill
+— yourcyberwill
 ```
 
 ## Database Queries

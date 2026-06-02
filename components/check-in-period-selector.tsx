@@ -37,7 +37,7 @@ export function CheckInPeriodSelector({
         <DialogHeader>
           <DialogTitle>Select Check-in Period</DialogTitle>
           <DialogDescription>
-            How often would you like to check in with Cipherwill?
+            How often would you like to check in with yourcyberwill?
           </DialogDescription>
         </DialogHeader>
 

@@ -89,7 +89,7 @@ export default async function DashboardPage({ searchParams }: PageProps) {
           <div className="space-y-2">
             <div className="flex items-center gap-3">
               <h1 className="text-2xl font-bold text-black dark:text-white">
-                Cipherwill
+                yourcyberwill
               </h1>
               {isPremium && <PremiumBadge />}
             </div>

@@ -16,12 +16,12 @@ export function getWelcomeEmailHTML(userName: string): string {
       <body>
         <div class="container">
           <div class="header">
-            <h1>Welcome to Cipherwill! 🎉</h1>
+            <h1>Welcome to yourcyberwill! 🎉</h1>
           </div>
           <div class="content">
             <p>Hi ${userName},</p>
             
-            <p>We're thrilled to have you join the Cipherwill community. Your account is now active and ready to use.</p>
+            <p>We're thrilled to have you join the yourcyberwill community. Your account is now active and ready to use.</p>
             
             <h2>What's Next?</h2>
             <ul>
@@ -31,16 +31,16 @@ export function getWelcomeEmailHTML(userName: string): string {
             </ul>
             
             <p>
-              <a href="https://cipherwill.com/dashboard" class="button">Go to Dashboard</a>
+              <a href="https://yourcyberwill.com/dashboard" class="button">Go to Dashboard</a>
             </p>
             
             <h2>Need Help?</h2>
             <p>If you have any questions or need assistance getting started, feel free to reach out to our support team.</p>
             
-            <p>Best regards,<br>The Cipherwill Team</p>
+            <p>Best regards,<br>The yourcyberwill Team</p>
           </div>
           <div class="footer">
-            <p>&copy; 2024 Cipherwill. All rights reserved.</p>
+            <p>&copy; 2024 yourcyberwill. All rights reserved.</p>
             <p>This is an automated welcome email. Please do not reply directly to this message.</p>
           </div>
         </div>
@@ -51,11 +51,11 @@ export function getWelcomeEmailHTML(userName: string): string {
 
 export function getWelcomeEmailText(userName: string): string {
   return `
-Welcome to Cipherwill! 🎉
+Welcome to yourcyberwill! 🎉
 
 Hi ${userName},
 
-We're thrilled to have you join the Cipherwill community. Your account is now active and ready to use.
+We're thrilled to have you join the yourcyberwill community. Your account is now active and ready to use.
 
 What's Next?
 
@@ -63,14 +63,14 @@ What's Next?
 • Add Recipients: Invite trusted friends or family members who will receive your important information and documents.
 • Secure Your Assets: Upload and organize important files, documents, and information that matter to you.
 
-Go to your dashboard to get started: https://cipherwill.com/dashboard
+Go to your dashboard to get started: https://yourcyberwill.com/dashboard
 
 Need Help?
 
 If you have any questions or need assistance getting started, feel free to reach out to our support team.
 
 Best regards,
-The Cipherwill Team
+The yourcyberwill Team
 
 ---
 This is an automated welcome email. Please do not reply directly to this message.

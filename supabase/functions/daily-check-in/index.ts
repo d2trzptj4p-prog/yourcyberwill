@@ -12,11 +12,11 @@ const APP_URL = (
 
 const DEFAULT_TEMPLATE = `Hi {recipient_name},
 
-{owner_name}, who tagged you as a check-in recipient on Cipherwill, has passed.
+{owner_name}, who tagged you as a check-in recipient on yourcyberwill, has passed.
 
 They did not complete their scheduled check-in in time.
 
-— Cipherwill`;
+— yourcyberwill`;
 
 type RecipientRow = {
   id: string;
@@ -109,7 +109,7 @@ ${recipientList}
 
 If you have any questions, please contact us.
 
-— Cipherwill`;
+— yourcyberwill`;
 
   const response = await fetch("https://api.resend.com/emails", {
     method: "POST",

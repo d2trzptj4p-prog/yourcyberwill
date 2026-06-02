@@ -74,13 +74,13 @@ async function sendReminderEmail(
   const emailSubject = `⏰ Reminder: Check in soon – ${daysPercent}% time remaining`;
   const emailBody = `Hi ${user.full_name || user.email},
 
-This is a friendly reminder that your Cipherwill check-in deadline is approaching. You have approximately <strong>${timeFormatted}</strong> left to complete your check-in.
+This is a friendly reminder that your yourcyberwill check-in deadline is approaching. You have approximately <strong>${timeFormatted}</strong> left to complete your check-in.
 
 Once you check in, your recipients will be notified and can access your vault if anything happens to you. Don't leave them waiting!
 
 <a href="${APP_URL}/dashboard" style="display: inline-block; margin-top: 20px; padding: 10px 20px; background-color: #3b82f6; color: white; text-decoration: none; border-radius: 5px;">Check In Now</a>
 
-— Cipherwill`;
+— yourcyberwill`;
 
   const response = await fetch("https://api.resend.com/emails", {
     method: "POST",

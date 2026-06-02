@@ -1,6 +1,6 @@
 import { decryptField, encryptField } from "@/lib/crypto/vault-crypto";
 
-const VERIFIER_PLAINTEXT = "cipherwill-vault-v1";
+const VERIFIER_PLAINTEXT = "yourcyberwill-vault-v1";
 
 export type PasswordVerifier = {
   ciphertext: string;

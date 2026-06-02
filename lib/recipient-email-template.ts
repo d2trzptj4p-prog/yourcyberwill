@@ -1,10 +1,10 @@
 export const DEFAULT_RECIPIENT_EMAIL_TEMPLATE = `Hi {recipient_name},
 
-{owner_name}, who tagged you as a check-in recipient on Cipherwill, has passed.
+{owner_name}, who tagged you as a check-in recipient on yourcyberwill, has passed.
 
 They did not complete their scheduled check-in in time.
 
-— Cipherwill`;
+— yourcyberwill`;
 
 export const RECIPIENT_EMAIL_PLACEHOLDERS = [
   "{recipient_name}",

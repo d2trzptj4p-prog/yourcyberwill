@@ -20,7 +20,7 @@ export default async function LoginPage({
             </div>
           </div>
           <h1 className="text-3xl font-bold tracking-tight text-black dark:text-white">
-            Cipherwill
+            yourcyberwill
           </h1>
           <p className="text-sm text-zinc-600 dark:text-zinc-400">
             Secure your digital legacy with end-to-end encryption
@@ -50,7 +50,7 @@ export default async function LoginPage({
         {/* Footer */}
         <div className="border-t border-zinc-200 pt-6 text-center dark:border-zinc-800">
           <p className="text-sm text-zinc-600 dark:text-zinc-400">
-            New to Cipherwill?{" "}
+            New to yourcyberwill?{" "}
             <Link href="/" className="font-medium text-black hover:underline dark:text-white">
               Learn more
             </Link>

@@ -1,4 +1,4 @@
-# Cipherwill Check-In Reminder System - Quick Start
+# yourcyberwill Check-In Reminder System - Quick Start
 
 ## What Was Created
 
@@ -102,7 +102,7 @@ Subject: ⏰ Reminder: Check in soon – 48% time remaining
 
 Hi John Doe,
 
-This is a friendly reminder that your Cipherwill check-in deadline is approaching. 
+This is a friendly reminder that your yourcyberwill check-in deadline is approaching. 
 You have approximately 21 days and 12 hours left to complete your check-in.
 
 Once you check in, your recipients will be notified and can access your vault if 
@@ -110,7 +110,7 @@ anything happens to you. Don't leave them waiting!
 
 [Check In Now Button] ← Links to dashboard
 
-— Cipherwill
+— yourcyberwill
 ```
 
 ## Database Changes

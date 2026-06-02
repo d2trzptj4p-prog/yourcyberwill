@@ -2,7 +2,7 @@ import { Resend } from "resend";
 import { getWelcomeEmailHTML, getWelcomeEmailText } from "./welcome-template";
 
 const resend = new Resend(process.env.RESEND_API_KEY);
-const fromEmail = process.env.RESEND_FROM_EMAIL || "noreply@cipherwill.com";
+const fromEmail = process.env.RESEND_FROM_EMAIL || "noreply@yourcyberwill.com";
 
 export async function sendWelcomeEmail(
   email: string,
@@ -21,7 +21,7 @@ export async function sendWelcomeEmail(
     const result = await resend.emails.send({
       from: fromEmail,
       to: email,
-      subject: "Welcome to Cipherwill! 🎉",
+      subject: "Welcome to yourcyberwill! 🎉",
       html: getWelcomeEmailHTML(userName),
       text: getWelcomeEmailText(userName),
     });
