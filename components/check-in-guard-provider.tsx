@@ -70,7 +70,8 @@ export function CheckInGuardProvider({
 
   useEffect(() => {
     refreshCheckIn();
-  }, [refreshCheckIn]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   useEffect(() => {
     if (!checkIn?.active || !checkIn.due_at || checkIn.recipients_notified_complete) {

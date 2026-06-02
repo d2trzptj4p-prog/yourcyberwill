@@ -44,8 +44,31 @@ export default async function DashboardPage({ searchParams }: PageProps) {
 
   const profile = await getOrCreateProfile(supabase, user);
 
+  if (!profile) {
+    return (
+      <div className="flex flex-col min-h-screen bg-white dark:bg-black">
+        <div className="mx-auto flex w-full max-w-5xl items-center justify-center px-6 py-12">
+          <div className="text-center">
+            <h1 className="text-2xl font-bold text-black dark:text-white mb-4">
+              Profile Error
+            </h1>
+            <p className="text-zinc-600 dark:text-zinc-400 mb-4">
+              Could not load your profile. Please try signing out and signing back in.
+            </p>
+            <a
+              href="/auth/logout"
+              className="inline-block px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
+            >
+              Sign Out
+            </a>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
   const displayName =
-    profile?.full_name ??
+    profile.full_name ??
     user.user_metadata?.full_name ??
     user.user_metadata?.name ??
     user.email ??

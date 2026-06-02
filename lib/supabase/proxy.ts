@@ -28,8 +28,8 @@ export async function updateSession(request: NextRequest) {
     },
   );
 
-  const { data } = await supabase.auth.getClaims();
-  const user = data?.claims;
+  const { data: userData, error: userError } = await supabase.auth.getUser();
+  const user = userData?.user;
   const { pathname } = request.nextUrl;
 
   const isAuthRoute =
@@ -37,7 +37,18 @@ export async function updateSession(request: NextRequest) {
   const isPublicReleaseRoute = pathname.startsWith("/release");
   const isProtectedRoute = pathname.startsWith("/dashboard");
 
+  if (isProtectedRoute) {
+    console.log("[proxy] Dashboard access attempt", {
+      hasUser: !!user,
+      pathname,
+      userId: user?.id,
+    });
+  }
+
   if (!user && isProtectedRoute) {
+    console.log("[proxy] Redirecting to login - no user found", {
+      pathname,
+    });
     const url = request.nextUrl.clone();
     url.pathname = "/login";
     return NextResponse.redirect(url);
