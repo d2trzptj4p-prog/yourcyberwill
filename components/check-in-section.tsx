@@ -17,11 +17,12 @@ import { CHECK_IN_FIRST_MESSAGE } from "@/lib/check-in-edit-block";
 import { type Recipient, recipientHasVaultLink } from "@/lib/check-in-types";
 import { useTierLimits } from "@/lib/use-tier-limits";
 import { ClockCountdownIcon, EnvelopeOpenIcon, UsersFour } from "@phosphor-icons/react";
-import { toast } from "sonner"
+import { toast } from "sonner";
+import { CheckInPeriodSelector } from "@/components/check-in-period-selector";
 
 function formatCountdown(ms: number): string {
   if (ms <= 0) {
-    return "Overdue";
+    return "Overdue. Please check in as soon as possible.";
   }
   const totalSeconds = Math.floor(ms / 1000);
   const days = Math.floor(totalSeconds / 86400);
@@ -74,6 +75,7 @@ export function CheckInSection() {
   const [encryptingNewRecipients, setEncryptingNewRecipients] = useState<
     number | null
   >(null);
+  const [showPeriodSelector, setShowPeriodSelector] = useState(false);
 
   const locked = checkIn?.recipients_notified_complete === true;
 
@@ -238,16 +240,46 @@ export function CheckInSection() {
       return;
     }
 
+    // Show period selector on first check-in
+    if (isFirstStart) {
+      setShowPeriodSelector(true);
+      return;
+    }
+
+    // For subsequent check-ins, proceed directly
     setError(null);
     setCheckingIn(true);
     try {
       const response = await fetch("/api/check-in", { method: "POST" });
       if (!response.ok) {
         const data = await response.json();
-          toast.error(data.error ?? "Check-in failed");
+        toast.error(data.error ?? "Check-in failed");
         throw new Error(data.error ?? "Check-in failed");
       }
       await refreshCheckIn();
+    } catch (e) {
+      setError(e instanceof Error ? e.message : "Check-in failed");
+    } finally {
+      setCheckingIn(false);
+    }
+  }
+
+  async function handlePeriodSelected(days: number) {
+    setError(null);
+    setCheckingIn(true);
+    try {
+      const response = await fetch("/api/check-in", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ check_in_interval_days: days }),
+      });
+      if (!response.ok) {
+        const data = await response.json();
+        toast.error(data.error ?? "Check-in failed");
+        throw new Error(data.error ?? "Check-in failed");
+      }
+      await refreshCheckIn();
+      setShowPeriodSelector(false);
     } catch (e) {
       setError(e instanceof Error ? e.message : "Check-in failed");
     } finally {
@@ -566,6 +598,13 @@ export function CheckInSection() {
           </p>
         )}
       </div>
+
+      <CheckInPeriodSelector
+        open={showPeriodSelector}
+        onSelect={handlePeriodSelected}
+        onCancel={() => setShowPeriodSelector(false)}
+        loading={checkingIn}
+      />
     </section>
   );
 }

@@ -4,7 +4,6 @@ import { DashboardVaultLayout } from "@/components/dashboard-vault-layout";
 import { PremiumBadge } from "@/components/premium-badge";
 import { SignOutButton } from "@/components/sign-out-button";
 import { SubscriptionSection } from "@/components/subscription-section";
-import { HandWavingIconClient } from "@/components/hand-waving-icon";
 import { getOrCreateProfile } from "@/lib/profile";
 import { syncUserSubscriptionOnLoad } from "@/lib/sync-user-subscription";
 import { handleLifetimePurchase } from "@/lib/handle-lifetime-purchase";
@@ -60,38 +59,58 @@ export default async function DashboardPage({ searchParams }: PageProps) {
   });
 
   return (
-    <div className="mx-auto flex w-full max-w-5xl flex-1 flex-col gap-8 px-6 py-12">
-      <header className="flex items-start justify-between gap-4">
-        <div className="space-y-1">
-          <h1 className="flex flex-wrap items-center gap-2 text-3xl tracking-tight">
-            YourCyberWill
-            {isPremium && <PremiumBadge />}
-          </h1>
-          <p className="text-zinc-600 dark:text-zinc-400 flex items-center gap-2">
-            <HandWavingIconClient className="ml-2 size-5" />
-            <span>Hey {displayName} <span className="">{isPremium ? " (Premium)" : "(Free User)"}</span></span> <span className="text-zinc-400 dark:text-zinc-600">({user.email})</span>
-          
-          </p>
+    <div className="flex flex-col min-h-screen bg-white dark:bg-black">
+      {/* Header */}
+      <header className="border-b border-zinc-200 dark:border-zinc-800">
+        <div className="mx-auto flex w-full max-w-5xl items-center justify-between gap-4 px-6 py-6">
+          <div className="space-y-2">
+            <div className="flex items-center gap-3">
+              <h1 className="text-2xl font-bold text-black dark:text-white">
+                Cipherwill
+              </h1>
+              {isPremium && <PremiumBadge />}
+            </div>
+            <p className="text-sm text-zinc-600 dark:text-zinc-400">
+              Hey {displayName} • {user.email}
+            </p>
+          </div>
+          <SignOutButton />
         </div>
-        <SignOutButton />
       </header>
 
-      <SubscriptionSection />
+      {/* Main Content */}
+      <main className="flex-1">
+        <div className="mx-auto flex w-full max-w-5xl flex-col gap-8 px-6 py-12">
+          <SubscriptionSection />
 
-      <DashboardVaultLayout />
+          <DashboardVaultLayout />
 
-      <section className="rounded-2xl border border-zinc-200 p-6 dark:border-zinc-800">
-        <h2 className="text-lg font-medium">Your account</h2>
-        <p className="mt-2 text-sm text-zinc-600 dark:text-zinc-400">
-          View and edit your profile, including your bio.
-        </p>
-        <Link
-          href="/dashboard/profile"
-          className="mt-6 inline-flex h-11 items-center justify-center rounded-full bg-zinc-900 px-6 text-sm font-medium text-white transition-colors hover:bg-zinc-700 dark:bg-zinc-100 dark:text-zinc-900 dark:hover:bg-zinc-300"
-        >
-          Profile
-        </Link>
-      </section>
+          {/* Account Section */}
+          <section className="rounded-xl border border-zinc-200 bg-zinc-50 p-8 dark:border-zinc-800 dark:bg-zinc-900">
+            <div className="space-y-4">
+              <div className="flex items-center gap-3">
+                <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-black dark:bg-white">
+                  <span className="text-lg dark:text-black">🔒</span>
+                </div>
+                <div>
+                  <h2 className="font-semibold text-black dark:text-white">
+                    Account Settings
+                  </h2>
+                  <p className="text-sm text-zinc-600 dark:text-zinc-400">
+                    View and manage your profile settings
+                  </p>
+                </div>
+              </div>
+              <Link
+                href="/dashboard/profile"
+                className="inline-flex h-10 items-center justify-center rounded-lg bg-black px-6 text-sm font-medium text-white transition-colors hover:bg-zinc-800 dark:bg-white dark:text-black dark:hover:bg-zinc-200"
+              >
+                Go to Profile
+              </Link>
+            </div>
+          </section>
+        </div>
+      </main>
     </div>
   );
 }

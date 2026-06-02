@@ -22,6 +22,8 @@ export type CheckInState = {
   recipient_email_template: string | null;
   /** Full check-in window length (ms); used for the 50% edit lock. */
   interval_ms: number;
+  /** User's selected check-in period in days (14, 30, 90, 180, or 365). */
+  check_in_interval_days: number;
 };
 
 export type SubscriptionState = {

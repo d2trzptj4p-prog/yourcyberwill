@@ -7,6 +7,7 @@ import {
   getVaultPasswordRequirementStatus,
   isVaultMasterPasswordValid,
 } from "@/lib/vault-password-policy";
+import { Eye, EyeSlash, Lock } from "@phosphor-icons/react";
 
 function PasswordField({
   label,
@@ -26,8 +27,8 @@ function PasswordField({
   autoComplete?: string;
 }) {
   return (
-    <label className="flex flex-col gap-2 text-sm">
-      <span className="font-medium text-zinc-700 dark:text-zinc-300">{label}</span>
+    <label className="flex flex-col gap-2">
+      <span className="text-sm font-medium text-black dark:text-white">{label}</span>
       <div className="relative">
         <Input
           type={visible ? "text" : "password"}
@@ -36,16 +37,19 @@ function PasswordField({
           required
           autoComplete={autoComplete}
           placeholder={placeholder}
-          className="w-full rounded-lg border border-zinc-300 bg-white py-2.5 pr-20 pl-4 outline-none ring-zinc-400 focus:ring-2 dark:border-zinc-700 dark:bg-zinc-900"
+          className="w-full rounded-lg border border-zinc-300 bg-white py-2.5 pr-12 pl-4 text-sm text-black outline-none ring-zinc-400 focus:ring-2 dark:border-zinc-700 dark:bg-zinc-900 dark:text-white"
         />
-        <Button
+        <button
           type="button"
           onClick={onToggleVisible}
-          variant="ghost"
-          className="absolute top-1/2 right-3 -translate-y-1/2 text-xs font-medium text-zinc-500 hover:text-zinc-800 dark:hover:text-zinc-200"
+          className="absolute top-1/2 right-3 -translate-y-1/2 text-zinc-500 hover:text-zinc-700 dark:hover:text-zinc-300"
         >
-          {visible ? "Hide" : "Show"}
-        </Button>
+          {visible ? (
+            <EyeSlash className="h-5 w-5" weight="bold" />
+          ) : (
+            <Eye className="h-5 w-5" weight="bold" />
+          )}
+        </button>
       </div>
     </label>
   );
@@ -75,107 +79,160 @@ export function VaultUnlock() {
 
   if (vaultGate === "loading") {
     return (
-      <section className="rounded-2xl border border-zinc-200 p-6 dark:border-zinc-800">
-        <h2 className="text-lg font-medium">Encrypted vault</h2>
-        <p className="mt-2 text-sm text-zinc-500">Loading…</p>
+      <section className="rounded-xl border border-zinc-200 bg-white p-8 dark:border-zinc-800 dark:bg-zinc-900">
+        <div className="flex items-center gap-3">
+          <div className="animate-spin">
+            <Lock className="h-5 w-5 text-zinc-500" />
+          </div>
+          <p className="text-sm text-zinc-500">Initializing vault…</p>
+        </div>
       </section>
     );
   }
 
-  const isCreate = vaultGate === "create";
-  const requirementStatus = getVaultPasswordRequirementStatus(newPassword);
-  const canCreateVault =
-    isVaultMasterPasswordValid(newPassword) &&
-    newPassword === confirmPassword &&
-    confirmPassword.length > 0;
+  if (vaultGate === "create") {
+    const requirements = getVaultPasswordRequirementStatus(newPassword);
+
+    return (
+      <section className="rounded-xl border border-zinc-200 bg-white p-8 dark:border-zinc-800 dark:bg-zinc-900">
+        <div className="space-y-6">
+          <div className="space-y-2">
+            <h2 className="text-2xl font-bold text-black dark:text-white">
+              Create Your Master Password
+            </h2>
+            <p className="text-sm text-zinc-600 dark:text-zinc-400">
+              This password protects your vault. Choose something strong and secure.
+            </p>
+          </div>
+
+          {releaseAccessWarning && (
+            <div className="rounded-lg border border-amber-300 bg-amber-50 px-4 py-3 dark:border-amber-900/40 dark:bg-amber-950/20">
+              <p className="text-sm font-medium text-amber-900 dark:text-amber-200">
+                ⚠️ Vault access scheduled to release
+              </p>
+              <p className="text-sm text-amber-800 dark:text-amber-300">
+                Your vault is configured to release due to missed check-ins. Creating a new password now will not prevent the scheduled release.
+              </p>
+            </div>
+          )}
+
+          <form onSubmit={handleCreateVault} className="space-y-4">
+            <PasswordField
+              label="Master Password"
+              value={newPassword}
+              onChange={setNewPassword}
+              visible={showNewPassword}
+              onToggleVisible={() => setShowNewPassword(!showNewPassword)}
+              placeholder="Enter a strong password"
+              autoComplete="new-password"
+            />
+
+            <PasswordField
+              label="Confirm Password"
+              value={confirmPassword}
+              onChange={setConfirmPassword}
+              visible={showConfirmPassword}
+              onToggleVisible={() => setShowConfirmPassword(!showConfirmPassword)}
+              placeholder="Confirm your password"
+              autoComplete="new-password"
+            />
+
+            {/* Password Requirements */}
+            <div className="space-y-2">
+              <p className="text-xs font-medium text-zinc-600 dark:text-zinc-400 uppercase">
+                Requirements
+              </p>
+              <div className="grid grid-cols-2 gap-2">
+                {getVaultPasswordRequirementStatus(newPassword).map((req, idx) => (
+                  <div
+                    key={idx}
+                    className={`text-xs px-2 py-1 rounded flex items-center gap-1 ${
+                      req.met
+                        ? "bg-emerald-100 text-emerald-800 dark:bg-emerald-950/30 dark:text-emerald-200"
+                        : "bg-zinc-100 text-zinc-600 dark:bg-zinc-900 dark:text-zinc-400"
+                    }`}
+                  >
+                    <span className={req.met ? "text-emerald-600" : "text-zinc-400"}>
+                      {req.met ? "✓" : "○"}
+                    </span>
+                    {req.label}
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            {unlockError && (
+              <div className="rounded-lg border border-red-300 bg-red-50 px-4 py-3 dark:border-red-900 dark:bg-red-950/30">
+                <p className="text-sm font-medium text-red-800 dark:text-red-200">
+                  {unlockError}
+                </p>
+              </div>
+            )}
+
+            <Button
+              type="submit"
+              disabled={loading}
+              className="w-full inline-flex h-11 items-center justify-center rounded-lg bg-black px-4 text-base font-medium text-white transition-colors hover:bg-zinc-800 disabled:opacity-50 dark:bg-white dark:text-black dark:hover:bg-zinc-200"
+            >
+              {loading ? "Creating vault…" : "Create Vault"}
+            </Button>
+          </form>
+        </div>
+      </section>
+    );
+  }
 
   return (
-    <section className="rounded-2xl border border-zinc-200 p-6 dark:border-zinc-800">
-      <h2 className="text-lg font-medium">Encrypted vault</h2>
-      <p className="mt-2 text-sm text-zinc-600 dark:text-zinc-400">
-        {isCreate
-          ? "Create a master password to unlock three sections: Passwords, Notes, and Files. Everything is encrypted in your browser before it reaches the server."
-          : "Enter your master password to access Passwords, Notes, and Files."}
-      </p>
+    <section className="rounded-xl border border-zinc-200 bg-white p-8 dark:border-zinc-800 dark:bg-zinc-900">
+      <div className="space-y-6">
+        <div className="space-y-2">
+          <h2 className="text-2xl font-bold text-black dark:text-white">
+            Unlock Your Vault
+          </h2>
+          <p className="text-sm text-zinc-600 dark:text-zinc-400">
+            Enter your master password to access your encrypted vault.
+          </p>
+        </div>
 
-      {isCreate ? (
-        <form onSubmit={handleCreateVault} className="mt-6 flex flex-col gap-4">
-          <PasswordField
-            label="New master password"
-            value={newPassword}
-            onChange={setNewPassword}
-            visible={showNewPassword}
-            onToggleVisible={() => setShowNewPassword((v) => !v)}
-            placeholder="Create a strong password"
-            autoComplete="new-password"
-          />
-          <PasswordField
-            label="Confirm master password"
-            value={confirmPassword}
-            onChange={setConfirmPassword}
-            visible={showConfirmPassword}
-            onToggleVisible={() => setShowConfirmPassword((v) => !v)}
-            placeholder="Re-enter your password"
-            autoComplete="new-password"
-          />
-          <ul className="rounded-lg border border-zinc-200 bg-zinc-50 px-4 py-3 text-xs dark:border-zinc-800 dark:bg-zinc-900/50">
-            {requirementStatus.map((item) => (
-              <li
-                key={item.label}
-                className={
-                  item.met
-                    ? "text-emerald-700 dark:text-emerald-400"
-                    : "text-zinc-500"
-                }
-              >
-                {item.met ? "✓" : "○"} {item.label}
-              </li>
-            ))}
-          </ul>
-          {unlockError && (
-            <p className="text-sm text-red-600 dark:text-red-400">{unlockError}</p>
-          )}
-          {releaseAccessWarning && (
-            <p className="text-sm text-amber-700 dark:text-amber-300">
-              {releaseAccessWarning}
+        {releaseAccessWarning && (
+          <div className="rounded-lg border border-amber-300 bg-amber-50 px-4 py-3 dark:border-amber-900/40 dark:bg-amber-950/20">
+            <p className="text-sm font-medium text-amber-900 dark:text-amber-200">
+              ⚠️ Vault access scheduled to release
             </p>
+            <p className="text-sm text-amber-800 dark:text-amber-300">
+              Your vault is configured to release due to missed check-ins.
+            </p>
+          </div>
+        )}
+
+        <form onSubmit={handleUnlock} className="space-y-4">
+          <PasswordField
+            label="Master Password"
+            value={masterPassword}
+            onChange={setMasterPassword}
+            visible={showUnlockPassword}
+            onToggleVisible={() => setShowUnlockPassword(!showUnlockPassword)}
+            placeholder="Enter your master password"
+          />
+
+          {unlockError && (
+            <div className="rounded-lg border border-red-300 bg-red-50 px-4 py-3 dark:border-red-900 dark:bg-red-950/30">
+              <p className="text-sm font-medium text-red-800 dark:text-red-200">
+                {unlockError}
+              </p>
+            </div>
           )}
+
           <Button
             type="submit"
-            disabled={loading || !canCreateVault}
-            className="inline-flex h-11 w-fit items-center justify-center rounded-full bg-zinc-900 px-6 text-sm font-medium text-white disabled:opacity-60 dark:bg-zinc-100 dark:text-zinc-900"
+            disabled={loading}
+            className="w-full inline-flex h-11 items-center justify-center rounded-lg bg-black px-4 text-base font-medium text-white transition-colors hover:bg-zinc-800 disabled:opacity-50 dark:bg-white dark:text-black dark:hover:bg-zinc-200"
           >
-            {loading ? "Creating…" : "Create vault password"}
+            {loading ? "Unlocking…" : "Unlock Vault"}
           </Button>
         </form>
-      ) : (
-        <form onSubmit={handleUnlock} className="mt-6 flex flex-col gap-4">
-              <PasswordField
-                label="Master password"
-                value={masterPassword}
-                onChange={setMasterPassword}
-                visible={showUnlockPassword}
-                onToggleVisible={() => setShowUnlockPassword((v) => !v)}
-                placeholder="Enter your master password"
-                autoComplete="current-password"
-              />
-          {unlockError && (
-            <p className="text-sm text-red-600 dark:text-red-400">{unlockError}</p>
-          )}
-          {releaseAccessWarning && (
-            <p className="text-sm text-amber-700 dark:text-amber-300">
-              {releaseAccessWarning}
-            </p>
-          )}
-          <Button
-            type="submit"
-            disabled={loading || !masterPassword}
-            className="inline-flex h-11 w-fit items-center justify-center rounded-full bg-zinc-900 px-6 text-sm font-medium text-white disabled:opacity-60 dark:bg-zinc-100 dark:text-zinc-900"
-          >
-            {loading ? "Unlocking…" : "Unlock vault"}
-          </Button>
-        </form>
-      )}
+      </div>
     </section>
   );
 }
+

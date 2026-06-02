@@ -14,7 +14,7 @@ export async function enforceCheckInEditAllowed(
   const { data: profile, error } = await supabase
     .from("profiles")
     .select(
-      "check_in_active, check_in_due_at, recipients_notified_complete",
+      "check_in_active, check_in_due_at, recipients_notified_complete, check_in_interval_days",
     )
     .eq("id", userId)
     .single();
@@ -29,7 +29,7 @@ export async function enforceCheckInEditAllowed(
         active: profile.check_in_active,
         due_at: profile.check_in_due_at,
         recipients_notified_complete: profile.recipients_notified_complete,
-        interval_ms: getCheckInIntervalMs(),
+        interval_ms: getCheckInIntervalMs(profile.check_in_interval_days),
       },
       profile.check_in_due_at
         ? new Date(profile.check_in_due_at).getTime() - Date.now()

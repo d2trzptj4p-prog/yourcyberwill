@@ -5,6 +5,7 @@ import { createClient } from "@/lib/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import type { Profile } from "@/lib/types";
+import { Check, X } from "@phosphor-icons/react";
 
 type ProfileFormProps = {
   profile: Profile;
@@ -39,14 +40,14 @@ export function ProfileForm({ profile }: ProfileFormProps) {
   }
 
   return (
-    <form onSubmit={handleSave} className="flex flex-col gap-6">
-      <div className="grid gap-4 sm:grid-cols-2">
+    <form onSubmit={handleSave} className="space-y-8">
+      <div className="grid gap-6 sm:grid-cols-2">
         <Field label="Email" value={profile.email ?? "—"} />
         <Field label="Full name" value={profile.full_name ?? "—"} />
       </div>
 
-      <div className="flex flex-col gap-2">
-        <label htmlFor="bio" className="text-sm font-medium text-zinc-700 dark:text-zinc-300">
+      <div className="space-y-3">
+        <label htmlFor="bio" className="block text-sm font-medium text-black dark:text-white">
           Bio
         </label>
         <Textarea
@@ -56,7 +57,7 @@ export function ProfileForm({ profile }: ProfileFormProps) {
           value={bio}
           onChange={(event) => setBio(event.target.value)}
           placeholder="Tell us a bit about yourself..."
-          className="w-full resize-y rounded-lg border border-zinc-300 bg-white px-4 py-3 text-sm text-zinc-900 outline-none ring-zinc-400 focus:ring-2 dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-50"
+          className="w-full resize-y rounded-lg border border-zinc-300 bg-white px-4 py-3 text-sm text-black outline-none ring-zinc-400 focus:ring-2 dark:border-zinc-700 dark:bg-zinc-900 dark:text-white"
         />
       </div>
 
@@ -64,19 +65,21 @@ export function ProfileForm({ profile }: ProfileFormProps) {
         <Button
           type="submit"
           disabled={status === "saving"}
-          className="rounded-full bg-zinc-900 px-6 py-2.5 text-sm font-medium text-white transition-colors hover:bg-zinc-700 disabled:opacity-60 dark:bg-zinc-100 dark:text-zinc-900 dark:hover:bg-zinc-300"
+          className="inline-flex h-10 items-center justify-center rounded-lg bg-black px-6 text-sm font-medium text-white transition-colors hover:bg-zinc-800 disabled:opacity-60 dark:bg-white dark:text-black dark:hover:bg-zinc-200"
         >
-          {status === "saving" ? "Saving…" : "Save profile"}
+          {status === "saving" ? "Saving…" : "Save Changes"}
         </Button>
         {status === "saved" && (
-          <span className="text-sm text-emerald-600 dark:text-emerald-400">
-            Saved
-          </span>
+          <div className="inline-flex items-center gap-2 text-sm font-medium text-emerald-600 dark:text-emerald-400">
+            <Check weight="bold" className="h-4 w-4" />
+            Saved successfully
+          </div>
         )}
         {status === "error" && errorMessage && (
-          <span className="text-sm text-red-600 dark:text-red-400">
+          <div className="inline-flex items-center gap-2 text-sm font-medium text-red-600 dark:text-red-400">
+            <X weight="bold" className="h-4 w-4" />
             {errorMessage}
-          </span>
+          </div>
         )}
       </div>
     </form>
@@ -85,11 +88,13 @@ export function ProfileForm({ profile }: ProfileFormProps) {
 
 function Field({ label, value }: { label: string; value: string }) {
   return (
-    <div className="flex flex-col gap-1 rounded-lg border border-zinc-200 bg-zinc-50 px-4 py-3 dark:border-zinc-800 dark:bg-zinc-900/50">
-      <span className="text-xs font-medium uppercase tracking-wide text-zinc-500">
+    <div className="space-y-2">
+      <span className="block text-xs font-semibold uppercase tracking-wide text-zinc-600 dark:text-zinc-400">
         {label}
       </span>
-      <span className="text-sm text-zinc-900 dark:text-zinc-100">{value}</span>
+      <div className="rounded-lg border border-zinc-300 bg-zinc-50 px-4 py-3 dark:border-zinc-700 dark:bg-zinc-900">
+        <span className="text-sm text-black dark:text-white">{value}</span>
+      </div>
     </div>
   );
 }

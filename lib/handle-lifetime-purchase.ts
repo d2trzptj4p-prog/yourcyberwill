@@ -35,7 +35,6 @@ export async function handleLifetimePurchase(userId: string): Promise<boolean> {
           id: order.id,
           paid: order.paid,
           status: order.status,
-          productBillingType: order.product?.billingType,
         });
 
         // Check if order is paid

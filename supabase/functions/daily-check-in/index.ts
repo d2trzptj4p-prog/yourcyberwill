@@ -88,6 +88,49 @@ async function sendRecipientEmail(
   }
 }
 
+async function sendOwnerNotificationEmail(
+  ownerEmail: string,
+  ownerName: string,
+  recipientEmails: string[],
+): Promise<void> {
+  if (!RESEND_API_KEY) {
+    throw new Error("RESEND_API_KEY is not set");
+  }
+
+  const recipientList = recipientEmails.map((email) => `<li>${email}</li>`).join("\n");
+  const emailBody = `Hi ${ownerName},
+
+We have sent notification emails to your check-in recipients. They have been notified about your overdue check-in and have been given access to your vault.
+
+Recipients notified:
+<ul>
+${recipientList}
+</ul>
+
+If you have any questions, please contact us.
+
+— Cipherwill`;
+
+  const response = await fetch("https://api.resend.com/emails", {
+    method: "POST",
+    headers: {
+      Authorization: `Bearer ${RESEND_API_KEY}`,
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({
+      from: RESEND_FROM_EMAIL,
+      to: [ownerEmail],
+      subject: "Notification: Recipients have been contacted",
+      html: emailBody,
+    }),
+  });
+
+  if (!response.ok) {
+    const text = await response.text();
+    throw new Error(`Resend error ${response.status}: ${text}`);
+  }
+}
+
 Deno.serve(async (req) => {
   if (req.method !== "POST") {
     return new Response(JSON.stringify({ error: "Method not allowed" }), {
@@ -120,6 +163,7 @@ Deno.serve(async (req) => {
     user_id: string;
     emails_sent: number;
     completed: boolean;
+    owner_notified?: boolean;
     error?: string;
   }[] = [];
 
@@ -179,6 +223,7 @@ Deno.serve(async (req) => {
 
     let sent = 0;
     let sendError: string | undefined;
+    const notifiedEmails: string[] = [];
 
     for (const recipient of recipients as RecipientRow[]) {
       if (!recipient.release_token || !recipient.wrapped_vault_key) {
@@ -198,6 +243,7 @@ Deno.serve(async (req) => {
           .update({ notified_at: now })
           .eq("id", recipient.id);
         sent++;
+        notifiedEmails.push(recipient.email);
       } catch (e) {
         sendError = e instanceof Error ? e.message : "Send failed";
         break;
@@ -211,6 +257,7 @@ Deno.serve(async (req) => {
       .is("notified_at", null);
 
     let completed = false;
+    let ownerNotified = false;
     if (remaining === 0 && !sendError) {
       await supabase
         .from("profiles")
@@ -221,12 +268,29 @@ Deno.serve(async (req) => {
         })
         .eq("id", profile.id);
       completed = true;
+
+      if (notifiedEmails.length > 0) {
+        try {
+          await sendOwnerNotificationEmail(
+            profile.email,
+            ownerName,
+            notifiedEmails,
+          );
+          ownerNotified = true;
+        } catch (e) {
+          sendError =
+            e instanceof Error
+              ? `Recipients notified but owner email failed: ${e.message}`
+              : "Recipients notified but owner email failed";
+        }
+      }
     }
 
     results.push({
       user_id: profile.id,
       emails_sent: sent,
       completed,
+      ...(ownerNotified ? { owner_notified: true } : {}),
       ...(sendError ? { error: sendError } : {}),
     });
   }

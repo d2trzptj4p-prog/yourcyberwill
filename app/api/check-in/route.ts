@@ -5,6 +5,7 @@ import {
 } from "@/lib/check-in-constants";
 import { isCheckInLocked } from "@/lib/check-in-lock";
 import type { CheckInState } from "@/lib/check-in-types";
+import { isValidCheckInPeriod } from "@/lib/check-in-periods";
 import { createClient } from "@/lib/supabase/server";
 import { NextResponse } from "next/server";
 
@@ -19,7 +20,7 @@ export async function GET() {
     supabase
       .from("profiles")
       .select(
-        "check_in_active, check_in_due_at, recipients_notified_complete, recipient_email_template",
+        "check_in_active, check_in_due_at, recipients_notified_complete, recipient_email_template, check_in_interval_days",
       )
       .eq("id", auth.user.id)
       .single(),
@@ -49,23 +50,33 @@ export async function GET() {
     recipients_notified_complete:
       profileResult.data.recipients_notified_complete,
     recipient_email_template: profileResult.data.recipient_email_template,
-    interval_ms: getCheckInIntervalMs(),
+    interval_ms: getCheckInIntervalMs(profileResult.data.check_in_interval_days),
+    check_in_interval_days: profileResult.data.check_in_interval_days ?? 30,
   };
 
   return NextResponse.json(state);
 }
 
-export async function POST() {
+export async function POST(request: Request) {
   const auth = await requireAuthUser();
   if (auth instanceof NextResponse) {
     return auth;
   }
 
+  let body: { check_in_interval_days?: unknown } = {};
+  try {
+    body = await request.json();
+  } catch {
+    // Body is optional
+  }
+
+  const { check_in_interval_days: requestedDays } = body;
+
   const supabase = await createClient();
 
   const { data: profile, error: profileError } = await supabase
     .from("profiles")
-    .select("recipients_notified_complete, crypto_salt")
+    .select("recipients_notified_complete, crypto_salt, check_in_interval_days")
     .eq("id", auth.user.id)
     .single();
 
@@ -105,17 +116,32 @@ export async function POST() {
     );
   }
 
-  const dueAt = computeCheckInDueAt();
+  // Determine interval days: use requested days if provided (first check-in with period selection),
+  // otherwise keep existing period from database (re-check-in), otherwise default to 30
+  let intervalDays = profile.check_in_interval_days ?? 30;
+  if (requestedDays !== undefined) {
+    if (!isValidCheckInPeriod(requestedDays)) {
+      return NextResponse.json(
+        { error: "Invalid check-in period. Must be 1, 14, 30, 90, 180, or 365 days." },
+        { status: 400 },
+      );
+    }
+    intervalDays = requestedDays;
+  }
+
+  const dueAt = computeCheckInDueAt(new Date(), intervalDays);
   const { data, error } = await supabase
     .from("profiles")
     .update({
       check_in_active: true,
       check_in_due_at: dueAt,
+      check_in_interval_days: intervalDays,
       last_recipient_notification_at: null,
+      reminder_notification_sent: false,
     })
     .eq("id", auth.user.id)
     .select(
-      "check_in_active, check_in_due_at, recipients_notified_complete, recipient_email_template",
+      "check_in_active, check_in_due_at, recipients_notified_complete, recipient_email_template, check_in_interval_days",
     )
     .single();
 
@@ -129,7 +155,8 @@ export async function POST() {
     recipient_count: count,
     recipients_notified_complete: data.recipients_notified_complete,
     recipient_email_template: data.recipient_email_template,
-    interval_ms: getCheckInIntervalMs(),
+    interval_ms: getCheckInIntervalMs(data.check_in_interval_days),
+    check_in_interval_days: data.check_in_interval_days ?? 30,
   };
 
   return NextResponse.json(state);

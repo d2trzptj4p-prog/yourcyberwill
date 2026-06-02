@@ -121,7 +121,7 @@ export function VaultPasswordsSection() {
     <section className="rounded-2xl border border-zinc-200 p-6 dark:border-zinc-800">
       <div className="flex flex-wrap items-start justify-between gap-3">
         <div>
-          <h2 className="text-lg font-medium">Password manager</h2>
+          <h2 className="text-lg font-medium text-white">Password manager</h2>
           <p className="mt-1 text-sm text-zinc-500">
             Account type, username, and password only — all encrypted.
             {tier && (
