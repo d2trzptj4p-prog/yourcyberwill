@@ -8,6 +8,7 @@ import { SignOutButton } from "@/components/sign-out-button";
 import { getOrCreateProfile } from "@/lib/profile";
 import { syncUserSubscriptionOnLoad } from "@/lib/sync-user-subscription";
 import { createClient } from "@/lib/supabase/server";
+import { Footer } from "@/app/components/footer";
 
 export default async function ProfilePage() {
   const supabase = await createClient();
@@ -34,8 +35,9 @@ export default async function ProfilePage() {
   }
 
   return (
-    <div className="mx-auto flex w-full max-w-3xl flex-1 flex-col gap-8 px-6 py-12">
-      <header className="flex items-start justify-between gap-4">
+    <div className="">
+      <div className="mx-auto flex w-full max-w-3xl flex-1 flex-col gap-8 px-6 py-12">
+        <header className="flex items-start justify-between gap-4">
         <div className="space-y-1">
           <Link
             href="/dashboard"
@@ -68,6 +70,9 @@ export default async function ProfilePage() {
       <ProfileSubscriptionSection profile={profile} />
 
       <ProfileForm profile={profile} />
+      </div>
+
+      <Footer/>
     </div>
   );
 }

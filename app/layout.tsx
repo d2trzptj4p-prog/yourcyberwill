@@ -13,7 +13,7 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "yourcyberwill - Secure Digital Legacy",
+  title: "Cipherwill - Secure Digital Legacy",
   description: "Protect your most important information with end-to-end encrypted storage and secure sharing.",
 };
 
@@ -22,16 +22,13 @@ export default function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  const themeMode = process.env.NEXT_PUBLIC_THEME_MODE || "auto";
-  const forceLight = themeMode === "light";
+  // const themeMode = process.env.NEXT_PUBLIC_THEME_MODE || "auto";
+  // const forceLight = themeMode === "light";
 
   return (
     <html
       lang="en"
-      className={`${geistSans.variable} ${geistMono.variable} h-full antialiased ${
-        forceLight ? "light" : ""
-      }`}
-      style={forceLight ? { colorScheme: "light" } : {}}
+      className={`${geistSans.className} ${geistMono.variable} h-full antialiased}`}
     >
       <body className="min-h-full flex flex-col bg-white dark:bg-black text-black dark:text-white">
         {children}

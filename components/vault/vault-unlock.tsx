@@ -37,7 +37,7 @@ function PasswordField({
           required
           autoComplete={autoComplete}
           placeholder={placeholder}
-          className="w-full rounded-lg border border-zinc-300 bg-white py-2.5 pr-12 pl-4 text-sm text-black outline-none ring-zinc-400 focus:ring-2 dark:border-zinc-700 dark:bg-zinc-900 dark:text-white"
+          className="w-full border border-zinc-300 bg-white py-2.5 pr-12 pl-4 text-sm text-black outline-none ring-zinc-400 focus:ring-2 dark:border-zinc-700 dark:bg-zinc-900 dark:text-white"
         />
         <button
           type="button"
@@ -79,8 +79,8 @@ export function VaultUnlock() {
 
   if (vaultGate === "loading") {
     return (
-      <section className="rounded-xl border border-zinc-200 bg-white p-8 dark:border-zinc-800 dark:bg-zinc-900">
-        <div className="flex items-center gap-3">
+      <section className="rounded-xl mt-6 border-2 border-slate-200 bg-white p-8 dark:border-zinc-800 dark:bg-zinc-900">
+        <div className="flex items-center gap-4">
           <div className="animate-spin">
             <Lock className="h-5 w-5 text-zinc-500" />
           </div>
@@ -94,14 +94,14 @@ export function VaultUnlock() {
     const requirements = getVaultPasswordRequirementStatus(newPassword);
 
     return (
-      <section className="rounded-xl border border-zinc-200 bg-white p-8 dark:border-zinc-800 dark:bg-zinc-900">
+      <section className="rounded-xl border-2 border-slate-200 bg-white p-8 dark:border-zinc-800 dark:bg-zinc-900">
         <div className="space-y-6">
           <div className="space-y-2">
-            <h2 className="text-2xl font-bold text-black dark:text-white">
-              Create Your Master Password
+            <h2 className="text-2xl text-black dark:text-white">
+              Create a vault password
             </h2>
             <p className="text-sm text-zinc-600 dark:text-zinc-400">
-              This password protects your vault. Choose something strong and secure.
+              Never lose this password as it <b>cannot</b> be recovered and is used to encrypt your data.
             </p>
           </div>
 
@@ -140,13 +140,13 @@ export function VaultUnlock() {
             {/* Password Requirements */}
             <div className="space-y-2">
               <p className="text-xs font-medium text-zinc-600 dark:text-zinc-400 uppercase">
-                Requirements
+                Requirements for a strong password
               </p>
               <div className="grid grid-cols-2 gap-2">
                 {getVaultPasswordRequirementStatus(newPassword).map((req, idx) => (
                   <div
                     key={idx}
-                    className={`text-xs px-2 py-1 rounded flex items-center gap-1 ${
+                    className={`text-xs px-2.5 py-1.5 rounded-full flex items-center gap-1 ${
                       req.met
                         ? "bg-emerald-100 text-emerald-800 dark:bg-emerald-950/30 dark:text-emerald-200"
                         : "bg-zinc-100 text-zinc-600 dark:bg-zinc-900 dark:text-zinc-400"
@@ -162,7 +162,7 @@ export function VaultUnlock() {
             </div>
 
             {unlockError && (
-              <div className="rounded-lg border border-red-300 bg-red-50 px-4 py-3 dark:border-red-900 dark:bg-red-950/30">
+              <div className="rounded-lg border-red-300 bg-red-50 px-4 py-3 dark:border-red-900 dark:bg-red-950/30">
                 <p className="text-sm font-medium text-red-800 dark:text-red-200">
                   {unlockError}
                 </p>
@@ -172,7 +172,7 @@ export function VaultUnlock() {
             <Button
               type="submit"
               disabled={loading}
-              className="w-full inline-flex h-11 items-center justify-center rounded-lg bg-black px-4 text-base font-medium text-white transition-colors hover:bg-zinc-800 disabled:opacity-50 dark:bg-white dark:text-black dark:hover:bg-zinc-200"
+              className="w-full h-13"
             >
               {loading ? "Creating vault…" : "Create Vault"}
             </Button>
@@ -186,7 +186,7 @@ export function VaultUnlock() {
     <section className="rounded-xl border border-zinc-200 bg-white p-8 dark:border-zinc-800 dark:bg-zinc-900">
       <div className="space-y-6">
         <div className="space-y-2">
-          <h2 className="text-2xl font-bold text-black dark:text-white">
+          <h2 className="text-2xl text-black dark:text-white">
             Unlock Your Vault
           </h2>
           <p className="text-sm text-zinc-600 dark:text-zinc-400">
@@ -195,9 +195,9 @@ export function VaultUnlock() {
         </div>
 
         {releaseAccessWarning && (
-          <div className="rounded-lg border border-amber-300 bg-amber-50 px-4 py-3 dark:border-amber-900/40 dark:bg-amber-950/20">
+          <div className="rounded-lg bg-yellow-100 px-4 py-3 dark:border-amber-900/40 dark:bg-amber-950/20">
             <p className="text-sm font-medium text-amber-900 dark:text-amber-200">
-              ⚠️ Vault access scheduled to release
+              Vault access scheduled to release
             </p>
             <p className="text-sm text-amber-800 dark:text-amber-300">
               Your vault is configured to release due to missed check-ins.

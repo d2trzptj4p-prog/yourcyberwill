@@ -1,5 +1,7 @@
 import Link from "next/link";
 import { GoogleSignInButton } from "@/components/google-sign-in-button";
+import { MagicLinkForm } from "@/components/magic-link-form";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 export default async function LoginPage({
   searchParams,
@@ -39,13 +41,27 @@ export default async function LoginPage({
           </div>
         )}
 
-        {/* Sign In Button */}
-        <div className="space-y-4">
-          <GoogleSignInButton />
-          <p className="text-center text-xs text-zinc-500 dark:text-zinc-400">
-            We use Google Sign-In to securely authenticate your account.
-          </p>
-        </div>
+        {/* Sign In Options */}
+        <Tabs defaultValue="google" className="w-full">
+          <TabsList className="grid w-full grid-cols-2">
+            <TabsTrigger value="google">Google</TabsTrigger>
+            <TabsTrigger value="magic">Magic Link</TabsTrigger>
+          </TabsList>
+
+          <TabsContent value="google" className="space-y-4 mt-4">
+            <GoogleSignInButton />
+            <p className="text-center text-xs text-zinc-500 dark:text-zinc-400">
+              We use Google Sign-In to securely authenticate your account.
+            </p>
+          </TabsContent>
+
+          <TabsContent value="magic" className="mt-4">
+            <MagicLinkForm />
+            <p className="text-center text-xs text-zinc-500 dark:text-zinc-400 mt-3">
+              We&apos;ll send you a secure link to sign in instantly.
+            </p>
+          </TabsContent>
+        </Tabs>
 
         {/* Footer */}
         <div className="border-t border-zinc-200 pt-6 text-center dark:border-zinc-800">

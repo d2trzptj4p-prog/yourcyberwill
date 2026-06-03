@@ -21,7 +21,7 @@ export async function sendWelcomeEmail(
     const result = await resend.emails.send({
       from: fromEmail,
       to: email,
-      subject: "Welcome to yourcyberwill! 🎉",
+      subject: "Welcome to YourCyberWill! 🎉",
       html: getWelcomeEmailHTML(userName),
       text: getWelcomeEmailText(userName),
     });

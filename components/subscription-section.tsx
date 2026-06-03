@@ -21,24 +21,24 @@ const PLANS: Plan[] = [
   {
     id: "monthly",
     name: "Monthly",
-    description: "Billed monthly, cancel anytime",
-    price: "$9.99",
+    description: "If you expect to use the service for a short time",
+    price: "$16.99",
     period: "/month",
   },
   {
     id: "yearly",
     name: "Yearly",
-    description: "Save 2 months vs monthly",
-    price: "$99.99",
+    description: "Best option for most individuals",
+    price: "$49.99",
     period: "/year",
-    highlighted: true,
   },
   {
     id: "lifetime",
     name: "Lifetime",
-    description: "One-time purchase, forever access",
-    price: "$299",
+    description: "Pay once and get ease of mind",
+    price: "$99.99",
     period: "one-time",
+    highlighted: true,
   },
 ];
 
@@ -50,6 +50,8 @@ export function SubscriptionSection() {
   const [checkingOut, setCheckingOut] = useState(false);
   const [selectedPlan, setSelectedPlan] = useState<PlanType>("yearly");
   const [error, setError] = useState<string | null>(null);
+
+  
 
   const load = useCallback(async () => {
     setError(null);
@@ -107,33 +109,30 @@ export function SubscriptionSection() {
   }
 
   return (
-    <section className="rounded-3xl bg-gray-100 border-zinc-200 p-6 dark:border-zinc-800">
+    <section className="rounded-3xl bg-slate-100 border-zinc-200 p-6 dark:border-zinc-800">
       <div className="flex items-center text-zinc-900 dark:text-zinc-100">
         <Crown className="mr-3 size-7 text-black" />
-        <h2 className="text-2xl">Go Premium</h2>
+        <h2 className="text-2xl">Premium</h2>
       </div>
-      {!subscription?.active && <ol className="mt-4 list-inside list-disc space-y-2 text-sm text-zinc-700 dark:text-zinc-300">
-        <li>
-          <strong>250 MB</strong> single file uploads{" "}
-          <span className="text-xs text-zinc-500">(vs 15 MB on Free)</span>
-        </li>
-        <li>
-          <strong>2 GB</strong> total secure storage{" "}
-          <span className="text-xs text-zinc-500">(vs 50 MB on Free)</span>
-        </li>
-        <li>
-          Up to <strong>50 secure passwords</strong> stored{" "}
-          <span className="text-xs text-zinc-500">(vs 3 on Free)</span>
-        </li>
-        <li>
-          Up to <strong>50 encrypted notes</strong>{" "}
-          <span className="text-xs text-zinc-500">(vs 1 on Free)</span>
-        </li>
-        <li>
-          Up to <strong>20 designated recipients</strong>{" "}
-          <span className="text-xs text-zinc-500">(vs 2 on Free)</span>
-        </li>
-      </ol>}
+      {!subscription?.active && (
+  <div className="mt-6 grid grid-cols-1 gap-1 text-sm sm:grid-cols-2 md:grid-cols-3">
+    {[
+      { title: "250 MB Uploads", desc: "Single file limit (vs 15 MB on Free)" },
+      { title: "2 GB Total Storage", desc: "Secure cloud capacity (vs 50 MB on Free)" },
+      { title: "50 Secure Passwords", desc: "Vault credentials (vs 3 on Free)" },
+      { title: "50 Encrypted Notes", desc: "Text & instructions (vs 1 on Free)" },
+      { title: "20 Recipients", desc: "Designated loved ones (vs 2 on Free)" }
+    ].map((item, index) => (
+      <div 
+        key={index} 
+        className="rounded-xl bg-slate-200 p-3  px-4"
+      >
+        <div className="font-semibold text-zinc-800 dark:text-zinc-200">{item.title}</div>
+        <div className="mt-1 text-xs text-zinc-500">{item.desc}</div>
+      </div>
+    ))}
+  </div>
+)}
 
       {error && (
         <p className="mt-4 rounded-lg bg-red-50 px-3 py-2 text-sm text-red-700 dark:bg-red-950/50 dark:text-red-300">
@@ -159,37 +158,37 @@ export function SubscriptionSection() {
                 <div
                   key={plan.id}
                   onClick={() => setSelectedPlan(plan.id)}
-                  className={`cursor-pointer rounded-2xl border-2 p-6 transition-all ${
+                  className={`cursor-pointer rounded-2xl p-6 transition-all ${
                     selectedPlan === plan.id
-                      ? "border-zinc-900 bg-white dark:border-zinc-100 dark:bg-zinc-900"
+                      ? "border-zinc-900 outline-2 bg-white dark:border-zinc-100 dark:bg-zinc-900"
                       : "border-zinc-200 bg-white dark:border-zinc-700 dark:bg-zinc-950"
-                  } ${plan.highlighted ? "ring-2 ring-yellow-400 ring-offset-2 dark:ring-offset-zinc-950" : ""}`}
+                  } ${plan.highlighted ? "" : ""}`}
                 >
                   {plan.highlighted && (
-                    <div className="mb-3 inline-block bg-yellow-100 px-3 py-1 rounded-full text-xs font-semibold text-yellow-800 dark:bg-yellow-900/40 dark:text-yellow-300">
+                    <div className="mb-3 inline-block bg-amber-100 px-3 py-1 rounded-full text-xs font-semibold text-yellow-800 dark:bg-yellow-900/40 dark:text-yellow-300">
                       Most Popular
                     </div>
                   )}
-                  <h3 className="text-lg font-bold text-zinc-900 dark:text-white">
+                  <h3 className="text-lg text-zinc-900 dark:text-white">
                     {plan.name}
                   </h3>
                   <p className="mt-2 text-sm text-zinc-600 dark:text-zinc-400">
                     {plan.description}
                   </p>
                   <div className="mt-4">
-                    <span className="text-3xl font-bold text-zinc-900 dark:text-white">
+                    <span className="text-4xl text-zinc-900 dark:text-white">
                       {plan.price}
                     </span>
                     <span className="text-sm text-zinc-600 dark:text-zinc-400">
                       {plan.period}
                     </span>
                   </div>
-                  {selectedPlan === plan.id && (
+                  {/* {selectedPlan === plan.id && (
                     <div className="mt-4 flex items-center text-sm font-medium text-emerald-600 dark:text-emerald-400">
                       <Check weight="bold" className="mr-2 size-4" />
                       Selected
                     </div>
-                  )}
+                  )} */}
                 </div>
               ))}
             </div>

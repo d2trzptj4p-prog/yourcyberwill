@@ -235,7 +235,7 @@ export function CheckInSection() {
   async function handleCheckIn() {
     if (firstStartVaultBlocked) {
       setError(
-        "Unlock your vault or create a vault password before starting check-ins.",
+        "Unlock your vault",
       );
       return;
     }
@@ -296,7 +296,7 @@ export function CheckInSection() {
 
   if (loading) {
     return (
-      <section className="rounded-2xl border border-zinc-200 p-6 dark:border-zinc-800">
+      <section className="rounded-2xl border-2 border-slate-200 p-6 dark:border-zinc-800">
         <p className="text-sm text-zinc-500">Loading check-ins…</p>
       </section>
     );
@@ -325,11 +325,11 @@ export function CheckInSection() {
   }
 
   return (
-    <section className="space-y-6 rounded-2xl mb-8 border border-zinc-200 p-6 dark:border-zinc-800">
+    <section className="space-y-6 rounded-2xl mb-8 border-2 border-slate-200 p-8 py-8 dark:border-zinc-800">
       <div>
         <h2 className="text-2xl">Check-ins</h2>
-        <p className="mt-1 text-sm text-zinc-600 dark:text-zinc-400">
-          Add the email of your beneficiaries. If you fail to check in before the deadline, we will send your beneficiaries an email with a link to access your encrypted vault.
+        <p className="mt-3 text-sm text-zinc-600 dark:text-zinc-400">
+          Add the email of your benficiaries that will eventually be sent your encrypted vault (via email)
         </p>
       </div>
 
@@ -359,8 +359,8 @@ export function CheckInSection() {
       )}
 
       {!encryptingLinks && recipientsNeedingLinks.length > 0 && !unlocked && (
-        <p className="rounded-lg bg-amber-50 px-3 py-2 text-sm text-amber-900 dark:bg-amber-950/50 dark:text-amber-200">
-          Unlock your vault below so we can encrypt view-only access links for
+        <p className="rounded-lg bg-red-400 px-3 py-2 text-sm text-white dark:bg-amber-950/50 dark:text-amber-200">
+          <b>IMPORTANT:</b> Unlock your vault below so we can encrypt view-only access links for
           your recipients.
         </p>
       )}
@@ -390,16 +390,16 @@ export function CheckInSection() {
 
       <div className="space-y-3">
         <div className="flex items-center justify-between gap-4">
-          <h3 className="text-sm font-medium text-zinc-900 dark:text-zinc-100">
+          <h3 className="text-sm font-medium text-zinc-900 bg-slate-100 rounded-full px-3 py-1 dark:text-zinc-100">
             Recipient email message
           </h3>
           <Button
             type="button"
-            variant="ghost"
+            variant="secondary"
             onClick={() => setShowTemplateEditor((v) => !v)}
-            className="text-lg font-medium text-zinc-600 underline-offset-2 hover:underline dark:text-zinc-400"
+            className="text-sm text-zinc-600 underline-offset-2 hover:underline dark:text-zinc-400"
           >
-            <EnvelopeOpenIcon className="size-6" />
+            <EnvelopeOpenIcon className="size-5" />
             {showTemplateEditor ? "Hide" : "Customize"}
           </Button>
         </div>
@@ -448,23 +448,23 @@ export function CheckInSection() {
 
       <div className="space-y-4">
         <div className="flex items-center justify-between gap-4">
-          <h3 className="text-sm font-medium text-zinc-900 dark:text-zinc-100">
+          <h3 className="text-sm font-medium text-zinc-900 dark:text-zinc-100 bg-slate-100 rounded-full px-3 py-1">
             Recipients
             {tier && (
               <span className="ml-2 font-normal text-zinc-500">
-                ({tier.usage.recipients} / {tier.limits.maxRecipients}{" "}
+                ({tier.usage.recipients}/{tier.limits.maxRecipients}{" "}
                 {tier.tier})
               </span>
             )}
           </h3>
           <Button
             type="button"
-            variant="ghost"
+            variant="default"
             disabled={atRecipientLimit}
             onClick={() => setShowForm((v) => !v)}
-            className="text-lg font-medium text-zinc-600 underline-offset-2 hover:underline disabled:opacity-40 dark:text-zinc-400"
+            className="text-sm text-white  underline-offset-2 hover:underline disabled:opacity-40 dark:text-zinc-400"
           >
-            <UsersFour className="size-6"/>
+            <UsersFour className="size-5"/>
             {showForm ? "Cancel" : "Add recipient"}
           </Button>
         </div>
@@ -472,10 +472,10 @@ export function CheckInSection() {
         {showForm && (
           <form
             onSubmit={handleAddRecipient}
-            className="flex flex-col gap-3 rounded-xl border border-zinc-200 p-4 dark:border-zinc-700"
+            className="flex flex-col gap-3 rounded-xl border-2 border-slate-200 p-6 dark:border-zinc-700"
           >
             <label className="flex flex-col gap-1 text-sm">
-              <span className="text-zinc-600 dark:text-zinc-400">Name</span>
+              <span className="text-zinc-600 dark:text-zinc-400">Full Name</span>
                 <Input
                   type="text"
                   required
@@ -483,12 +483,12 @@ export function CheckInSection() {
                   onChange={(e) =>
                     setForm((f) => ({ ...f, name: e.target.value }))
                   }
-                  className="rounded-lg border border-zinc-300 bg-white px-3 py-2 dark:border-zinc-600 dark:bg-zinc-900"
+                  className="border border-zinc-300 bg-white px-3 py-2 dark:border-zinc-600 dark:bg-zinc-900"
                   placeholder="Jane Doe"
                 />
             </label>
             <label className="flex flex-col gap-1 text-sm">
-              <span className="text-zinc-600 dark:text-zinc-400">Email</span>
+              <span className="text-zinc-600 dark:text-zinc-400">Email (double check the email is correct)</span>
               <Input
                 type="email"
                 required
@@ -496,14 +496,14 @@ export function CheckInSection() {
                 onChange={(e) =>
                   setForm((f) => ({ ...f, email: e.target.value }))
                 }
-                className="rounded-lg border border-zinc-300 bg-white px-3 py-2 dark:border-zinc-600 dark:bg-zinc-900"
+                className="border border-zinc-300 bg-white px-3 py-2 dark:border-zinc-600 dark:bg-zinc-900"
                 placeholder="jane@example.com"
               />
             </label>
             <Button
               type="submit"
               disabled={saving}
-              className="h-10 rounded-full bg-zinc-900 text-sm font-medium text-white disabled:opacity-50 dark:bg-zinc-100 dark:text-zinc-900"
+              className="h-10 w-fit"
             >
               {saving ? "Saving…" : "Save recipient"}
             </Button>
@@ -511,9 +511,10 @@ export function CheckInSection() {
         )}
 
         {recipients.length === 0 ? (
-          <p className="text-sm text-zinc-500">
-            No recipients yet. Add at least one to start check-ins.
-          </p>
+          // <p className="text-sm text-zinc-500">
+          //   No recipients yet. Add at least one to start check-ins.
+          // </p>
+          <></>
         ) : (
           <>
             {recipients.length === 1 && (
@@ -550,14 +551,14 @@ export function CheckInSection() {
         )}
       </div>
 
-      <div className="flex flex-col items-start gap-4 border-t border-zinc-200 pt-6 dark:border-zinc-700">
+      <div className="flex flex-col items-start gap-4 border-t-2 border-slate-200 pt-6 dark:border-zinc-700">
         {checkIn?.active && checkIn.due_at && remainingMs !== null && (
-          <div className="w-full rounded-xl bg-zinc-50 px-4 py-4 text-center dark:bg-zinc-900">
-            <p className="text-xs uppercase tracking-wide text-zinc-500">
-              Time until check-in due
+          <div className="w-full rounded-xl bg-slate-100 px-4 py-4 text-center dark:bg-zinc-900">
+            <p className="text-md uppercase tracking-wide text-zinc-500">
+              Time until benificaries are emailed
             </p>
             <p
-              className={`mt-1 font-mono text-2xl font-semibold tabular-nums ${
+              className={`mt-2 font-mono text-3xl ${
                 remainingMs <= 0
                   ? "text-red-600 dark:text-red-400"
                   : "text-zinc-900 dark:text-zinc-100"
@@ -568,7 +569,8 @@ export function CheckInSection() {
           </div>
         )}
 
-        <Button
+        <div className="flex items-center gap-3 justify-center w-full">
+<Button
           type="button"
           onClick={handleCheckIn}
           disabled={!canStartOrCheckIn || checkingIn}
@@ -581,13 +583,14 @@ export function CheckInSection() {
                 : undefined
               : undefined
           }
-          className="inline-flex h-14 items-center justify-center rounded-full px-8 text-lg font-medium text-white transition-colors disabled:cursor-not-allowed disabled:opacity-40"
+          className="inline-flex h-16 items-center justify-center rounded-full px-12 text-lg font-medium text-white transition-colors disabled:cursor-not-allowed disabled:opacity-40"
         >
-          <ClockCountdownIcon weight="fill" className="size-6 mr-1" />
+          {/* <ClockCountdownIcon weight="fill" className="size-6 mr-1" /> */}
           {checkingIn ? "Saving…" : buttonLabel}
         </Button>
+        </div>
 
-        {!canStartOrCheckIn && recipientCount < 1 && (
+        {/* {!canStartOrCheckIn && recipientCount < 1 && (
           <p className="text-xs text-zinc-500">
             Add at least one recipient to enable check-ins.
           </p>
@@ -596,7 +599,7 @@ export function CheckInSection() {
           <p className="text-xs text-amber-700 dark:text-amber-300">
             Unlock your vault or create a vault password before starting check-ins.
           </p>
-        )}
+        )} */}
       </div>
 
       <CheckInPeriodSelector

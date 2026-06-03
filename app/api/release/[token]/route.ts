@@ -10,7 +10,7 @@ export async function GET(_request: Request, context: RouteContext) {
 
   if (!recipient) {
     return NextResponse.json(
-      { error: "Invalid or inactive release link" },
+      { error: "This link probably expired" },
       { status: 404 },
     );
   }

@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { createClient } from "@/lib/supabase/client";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import type { Profile } from "@/lib/types";
 import { Check, X } from "@phosphor-icons/react";
@@ -12,6 +13,7 @@ type ProfileFormProps = {
 };
 
 export function ProfileForm({ profile }: ProfileFormProps) {
+  const [fullName, setFullName] = useState(profile.full_name ?? "");
   const [bio, setBio] = useState(profile.bio ?? "");
   const [status, setStatus] = useState<"idle" | "saving" | "saved" | "error">(
     "idle",
@@ -26,7 +28,11 @@ export function ProfileForm({ profile }: ProfileFormProps) {
     const supabase = createClient();
     const { error } = await supabase
       .from("profiles")
-      .update({ bio, updated_at: new Date().toISOString() })
+      .update({ 
+        full_name: fullName, 
+        bio, 
+        updated_at: new Date().toISOString() 
+      })
       .eq("id", profile.id);
 
     if (error) {
@@ -43,7 +49,19 @@ export function ProfileForm({ profile }: ProfileFormProps) {
     <form onSubmit={handleSave} className="space-y-8">
       <div className="grid gap-6 sm:grid-cols-2">
         <Field label="Email" value={profile.email ?? "—"} />
-        <Field label="Full name" value={profile.full_name ?? "—"} />
+        <div className="space-y-2">
+          <label htmlFor="fullName" className="block text-xs font-semibold uppercase tracking-wide text-zinc-600 dark:text-zinc-400">
+            Full name
+          </label>
+          <Input
+            id="fullName"
+            type="text"
+            value={fullName}
+            onChange={(e) => setFullName(e.target.value)}
+            placeholder="Your name"
+            className="rounded-lg border border-zinc-300 bg-white px-4 py-3 dark:border-zinc-700 dark:bg-zinc-900"
+          />
+        </div>
       </div>
 
       <div className="space-y-3">

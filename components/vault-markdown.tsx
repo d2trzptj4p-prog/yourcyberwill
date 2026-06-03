@@ -7,7 +7,7 @@ export function VaultMarkdown({ content }: { content: string }) {
   }
 
   return (
-    <div className="vault-markdown text-sm leading-relaxed text-zinc-800 dark:text-zinc-200">
+    <div className="vault-markdown text-sm leading-relaxed text-black">
       <ReactMarkdown
         remarkPlugins={[remarkGfm]}
         components={{
