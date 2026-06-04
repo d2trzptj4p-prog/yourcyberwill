@@ -1,5 +1,7 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
+import { Analytics } from "@vercel/analytics/next"
+import { SpeedInsights } from "@vercel/speed-insights/next"
 import "./globals.css";
 
 const geistSans = Geist({
@@ -27,6 +29,8 @@ export default function RootLayout({
       lang="en"
       className={`${geistSans.className} ${geistMono.variable} h-full antialiased}`}
     >
+      <Analytics />
+      <SpeedInsights/>
       <head>
         <title>YourCyberWill | Open-Source Digital Dead Man's Switch</title>
 <meta name="title" content="YourCyberWill | Open-Source Digital Dead Man's Switch" />
