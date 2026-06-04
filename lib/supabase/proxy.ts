@@ -33,7 +33,7 @@ export async function updateSession(request: NextRequest) {
   const { pathname } = request.nextUrl;
 
   const isAuthRoute =
-    pathname.startsWith("/login") || pathname.startsWith("/auth") || pathname.startsWith("/sitemap.xml") || pathname.startsWith("/sitemap.xml") || pathname.startsWith("/privacy") || pathname.startsWith("/terms") || pathname.startsWith("/hero.mov");
+    pathname.startsWith("/login") || pathname.startsWith("/auth") || pathname.startsWith("/sitemap.xml") || pathname.startsWith("/sitemap.xml") ||  pathname.startsWith("/sitemap.xml") || pathname.startsWith("/privacy") || pathname.startsWith("/terms") || pathname.startsWith("/hero.mov")|| pathname.startsWith("/api") || pathname.startsWith("/api/webhooks/polar")|| pathname.startsWith("/blog");
   const isPublicReleaseRoute = pathname.startsWith("/release");
   const isProtectedRoute = pathname.startsWith("/dashboard");
 

@@ -184,7 +184,7 @@ const PRICING = [
   {
     name: "Premium Yearly",
     price: "$46",
-    period: "/month",
+    period: "/year",
     description: "For serious holders who can't afford to lose access.",
     cta: "Go Premium",
     features: [
