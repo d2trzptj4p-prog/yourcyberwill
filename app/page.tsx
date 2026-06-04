@@ -422,6 +422,9 @@ export default function Home() {
           <p className="mt-4 text-center text-sm text-slate-500">
             See exactly how your vault is built, checked, and released — in under 5 minutes.
           </p>
+          <p className="mt-4 text-center text-sm text-slate-500">
+            Note: Our pricings have changed since the recording
+          </p>
         </div>
       </section>
 
@@ -824,7 +827,7 @@ export default function Home() {
             <span className="text-xs font-bold uppercase tracking-[0.2em] text-slate-400">
               Pricing
             </span>
-            <h2 className="mt-3 text-3xl font-extrabold tracking-tight text-slate-950 sm:text-4xl">
+            <h2 className="mt-3 text-3xl tracking-tight text-slate-950 sm:text-5xl">
               Simple plans for total peace of mind
             </h2>
             <p className="mx-auto mt-4 max-w-xl text-base leading-relaxed text-slate-600">
