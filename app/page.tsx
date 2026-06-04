@@ -1,7 +1,8 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
 import {
   ShieldCheckIcon,
@@ -12,65 +13,222 @@ import {
   WalletIcon,
   ArrowRightIcon,
   CaretDownIcon,
-  EnvelopeOpenIcon,
   GithubLogoIcon,
   FingerprintIcon,
   LinkSimpleIcon,
   UsersFourIcon,
-  CursorIcon,
-  MailboxIcon,
-  MicrosoftOutlookLogoIcon,
-  PaperPlane,
+  PlayCircleIcon,
+  StarIcon,
+  LockKeyIcon,
+  HeartIcon,
+  FileLockIcon,
+  BellRingingIcon,
+  CheckCircleIcon,
+  CurrencyBtcIcon,
+  ChatCircleTextIcon,
+  DeviceMobileIcon,
+  EnvelopeOpenIcon,
 } from "@phosphor-icons/react";
 import { Button } from "@/components/ui/button";
 import { Footer } from "./components/footer";
+import { User } from "@phosphor-icons/react/dist/ssr";
+
+/* ------------------------------------------------------------------ */
+/*  DATA                                                               */
+/* ------------------------------------------------------------------ */
+
+const TRUST_STATS = [
+  { value: "AES-256", label: "Client-side encryption" },
+  { value: "0", label: "Keys we can ever read" },
+  { value: "100%", label: "Open source code" },
+  { value: "15-day", label: "Self-destructing links" },
+] as const;
+
+const REVIEWS = [
+  {
+    name: "Akash S",
+    role: "Bitcoin holder and startup founder",
+    quote:
+      "I have quite a bit of money in my crypto account and I feel good knowing I have a plan for it to be passed on if something happens to me. The vault is easy to set up and gives me peace of mind. Would recommend!",
+    avatar: "/review-1.png",
+  },
+  {
+    name: "Scott P.",
+    role: "A normal guy",
+    quote:
+      "i was very intriguied about the concept of how YourCyberWill works and I think it is something everyone should have. kinda like life-insurance haha! but yes, very easy to setup and understand how it works.",
+    avatar: "/review-2.png",
+  },
+  {
+    name: "Anonymous Reviewer",
+    role: "Father of beautiful kids",
+    quote:
+      "You know, I wrote final letters to my kids, which feels weird ofcourse. But knowing they'll receive them — only if I'm truly gone — gives me a strange, real peace and obviously not leave them scrambling to try and reocover dumb passwords and important files. YourCyberWill just makes so much sense.",
+    avatar: "/review-3.png",
+  },
+] as const;
 
 const HOW_IT_WORKS_SECTIONS = [
   {
     step: "01",
-    title: "Build Your Encrypted Vault",
-    subtitle: "Add passwords, crypto keys, files, or sensitive final notes.",
-    description:
-      "Your data is instantly transformed into unreadable ciphertext directly inside your browser using zero-knowledge AES-256 encryption. We never see your master passphrase, and your unencrypted data never touches the internet.",
-    Icon: VaultIcon,
     badge: "Securely add your details",
-    placeholderType: "vault",
-    dark: false,
+    title: "Build your encrypted vault",
+    subtitle: "Add passwords, crypto keys, files, or final messages.",
+    description:
+      "Everything you add is turned into unreadable ciphertext inside your browser using zero-knowledge AES-256 encryption. We never see your master passphrase, and your unencrypted data never touches the internet.",
+    Icon: VaultIcon,
+    image: "/step-1.png",
+    imageAlt: "Encrypted vault interface",
   },
   {
     step: "02",
-    title: "Set Your Life Check-In Timer",
-    subtitle: "Define your threshold and tell the system when to look for you.",
+    badge: "Confirm you're alive & well",
+    title: "Set your life check-in timer",
+    subtitle: "Decide how often you confirm you're okay.",
     description:
-      "You decide how often you confirm you're okay — every 30 days, 90 days, or 6 months. As the timer nears its end, we email you constant reminders. A simple click will reset the counter.",
+      "Choose your interval — every 30 days, 90 days, or 6 months. As the timer nears its end we ping you relentlessly across email, SMS, and messaging apps. A single click resets the counter. No accidental triggers, ever.",
     Icon: ClockCountdownIcon,
-    badge: "Check-in to confirm your alive and not incapacitated",
-    placeholderType: "timer",
-    dark: false,
+    image: "/step-2.png",
+    imageAlt: "Check-in timer interface",
   },
   {
     step: "03",
-    title: "Automated, Expiring Release",
-    subtitle: "Safe delivery to beneficiaries only if you completely disappear.",
+    badge: "Secure delivery protocol",
+    title: "Automated, expiring release",
+    subtitle: "Delivered to your people only if you go fully silent.",
     description:
-      "If you go entirely silent and miss multiple consecutive safety check-ins, the switch triggers. Beneficiaries receive a secure, uniquely encrypted link to the vault — which self-destructs after 15 days to prevent permanent exposure.",
+      "If you miss multiple consecutive check-ins, the switch triggers. Your beneficiaries receive a uniquely encrypted link to the vault — which self-destructs after 15 days to prevent permanent exposure.",
     Icon: PaperPlaneTiltIcon,
-    badge: "Secure Delivery Protocol",
-    placeholderType: "release",
-    dark: true,
+    image: "/step-3.png",
+    imageAlt: "Secure delivery to beneficiaries",
+  },
+  {
+    step: "04",
+    badge: "Your tagged benificiaries get access",
+    title: "They get the message",
+    subtitle: "Your people can access the vault with an encrypted link",
+    description:
+      "The day comes and your timer goes over due. Our servers automatically send your people a link that self destructs after 15 days for security",
+    Icon: EnvelopeOpenIcon,
+    image: "/step-4.png",
+    imageAlt: "Secure delivery to beneficiaries",
+  },
+] as const;
+
+const FEATURES = [
+  {
+    Icon: FingerprintIcon,
+    title: "Zero-knowledge by design",
+    text: "Your master password encrypts data locally before anything is stored. We hold no keys — we literally cannot read your vault.",
+  },
+  {
+    Icon: BellRingingIcon,
+    title: "Check-in fail-safe",
+    text: "Repeated reminders over email are sent to you as your timer ticks to zero. You will not trigger by accident.",
+  },
+  {
+    Icon: CurrencyBtcIcon,
+    title: "Built for crypto self-custody",
+    text: "Seed phrases, hardware wallet PINs, and exchange logins are protected and recoverable — without ever exposing them to us.",
+  },
+  {
+    Icon: FileLockIcon,
+    title: "Files & final messages",
+    text: "Store documents, letters, and wishes alongside credentials. Everything your people need, in one encrypted place.",
+  },
+  {
+    Icon: GithubLogoIcon,
+    title: "Fully open source",
+    text: "Our cryptographic architecture and trigger scripts are publicly auditable on GitHub. Transparency is non-negotiable for inheritance.",
+  },
+  {
+    Icon: UsersFourIcon,
+    title: "Multiple beneficiaries",
+    text: "Designate exactly who receives access, and what they can see. Different people, different vaults, different keys.",
+  },
+] as const;
+
+const PRICING = [
+  {
+    name: "Starter",
+    price: "$0",
+    period: "forever",
+    description: "Everything you need to secure the essentials.",
+    cta: "Start free",
+    highlighted: false,
+    features: [
+      "1 password",
+      "1 beneficiary",
+      "1 note",
+      "Limited file storage",
+      "Email reminders",
+    
+    ],
+  },
+  {
+    name: "Premium Monthly",
+    price: "$16",
+    period: "/month",
+    description: "For serious holders who can't afford to lose access.",
+    cta: "Go Pro",
+
+    features: [
+      "20 benificiaries",
+      "50 passwords",
+      "Lots of file storage",
+      "50 notes",
+      "Priority support",
+      "Email reminders",
+    ],
+  },
+  {
+    name: "Premium Yearly",
+    price: "$46",
+    period: "/month",
+    description: "For serious holders who can't afford to lose access.",
+    cta: "Go Premium",
+    features: [
+      "20 benificiaries",
+      "50 passwords",
+      "Lots of file storage",
+      "50 notes",
+      "Priority support",
+      "Email reminders",
+    ],
+  },
+  {
+    name: "Premium Lifetime",
+    price: "$86",
+    period: "one-time",
+    description: "Pay once and get ease of mind",
+    cta: "Go Premium",
+        highlighted: true,
+    features: [
+      "20 benificiaries",
+      "50 passwords",
+      "Lots of file storage",
+      "50 notes",
+      "Priority support",
+      "Email reminders",
+    ],
   },
 ] as const;
 
 const FAQS = [
   {
-    question: "Is yourcyberwill open source?",
+    question: "Is YourCyberWill open source?",
     answer:
-      "Yes, 100%. Our entire codebase, including the cryptographic vault architecture and automated trigger scripts, is publicly auditable on GitHub. We believe transparency is non-negotiable for digital inheritance.",
+      "Yes, 100%. Our entire codebase, including the cryptographic vault architecture and automated trigger scripts, is publicly auditable on GitHub at https://github.com/d2trzptj4p-prog/yourcyberwill. We believe transparency is non-negotiable for digital inheritance.",
+  },
+  {
+    question: "Is YourCyberWill free?",
+    answer:
+      "YourCyberWill is completely free to use with all features. However Premium, which is extremely affordable, is a paid perk which allows you to upload more files, notes, passwords, and numbers of beneficiaries.",
   },
   {
     question: "What happens if I just forget to click a check-in email?",
     answer:
-      "We built an aggressive, multi-week fail-safe so you won't accidentally trigger your vault. We don't send one email — we ping you repeatedly via email, backup emails, SMS, and messaging apps over a grace period you define before anything reaches beneficiaries.",
+      "We built an aggressive, multi-week fail-safe so you won't accidentally trigger your vault. We don't send one email — we ping you repeatedly via email.",
   },
   {
     question: "Can your developers see the data I put inside my vault?",
@@ -87,7 +245,11 @@ const FAQS = [
     answer:
       "Because our platform functions as an open-source protocol in key areas, your automated checks are resilient. Our trust-backed operational runway guarantees data preservation, and users can opt into decentralized Web3 backups that run independently of our servers.",
   },
-];
+] as const;
+
+/* ------------------------------------------------------------------ */
+/*  ANIMATION                                                          */
+/* ------------------------------------------------------------------ */
 
 const fadeUp = {
   hidden: { opacity: 0, y: 28 },
@@ -98,126 +260,270 @@ const fadeUp = {
   }),
 };
 
+/* ------------------------------------------------------------------ */
+/*  PAGE                                                               */
+/* ------------------------------------------------------------------ */
+
 export default function Home() {
   const [openFaq, setOpenFaq] = useState<number | null>(0);
+  const router = useRouter();
+
+  // Autoload / prefetch the login route so sign-in is instant.
+  useEffect(() => {
+    router.prefetch("/login");
+  }, [router]);
 
   return (
-    <div className="flex flex-col min-h-screen bg-white text-zinc-900 antialiased selection:bg-zinc-900 selection:text-white">
-      {/* Header */}
-      <header className="sticky top-0 z-50 border-zinc-100 bg-white/70 backdrop-blur-xl">
+    <div className="flex flex-col min-h-screen bg-white text-slate-900 antialiased selection:bg-slate-900 selection:text-white">
+      {/* ---------------------------------------------------------- */}
+      {/* Header                                                     */}
+      {/* ---------------------------------------------------------- */}
+      <header className="sticky top-0 z-50 backdrop-blur-xl">
         <div className="mx-auto max-w-6xl px-6 py-3.5">
           <div className="flex items-center justify-between">
             <Link href="/" className="flex items-center gap-2.5 select-none">
-              <div className="flex items-center justify-between">
-            <div className="w-[200px] h-12 select-none overflow-hidden flex justify-center items-center">
-              <img className="min-w-full min-h-full object-cover scale-150" src="/textlogo.png" alt="yourcyberwill Logo" />
+              <div className="flex h-12 w-48 items-center justify-center overflow-hidden select-none">
+                <img
+                  className="min-h-full min-w-full scale-150 object-cover"
+                  src="/textlogo.png"
+                  alt="yourcyberwill Logo"
+                />
+              </div>
+            </Link>
+
+            <nav className="hidden items-center gap-1 md:flex">
+              <Link href="#process-steps">
+                <Button variant="ghost">How it works</Button>
+              </Link>
+              <Link href="#features">
+                <Button variant="ghost">Features</Button>
+              </Link>
+              <Link href="#pricing">
+                <Button variant="ghost">Pricing</Button>
+              </Link>
+              <Link href="#faq">
+                <Button variant="ghost">FAQ</Button>
+              </Link>
+            </nav>
+
+            <div className="flex items-center gap-2">
+              <Link href="/login">
+                <Button>Sign In</Button>
+              </Link>
             </div>
-            
-          </div>
-            </Link>
-            <Link
-              href="/login"
-              
-            >
-              <Button>
-                Sign In
-              </Button>
-            </Link>
           </div>
         </div>
       </header>
 
-      {/* Hero */}
-      <section className="relative overflow-hidden">
-        {/* Decorative dot grid + glow */}
+      {/* ---------------------------------------------------------- */}
+      {/* Hero — full-viewport hero.png background                    */}
+      {/* ---------------------------------------------------------- */}
+      <section
+        className="relative flex min-h-screen items-center overflow-hidden bg-cover bg-center bg-no-repeat"
+        style={{ backgroundImage: "url('/hero.png')" }}
+      >
+        {/* Overlay keeps text readable and blends into the white page below */}
         <div
           aria-hidden
-          // className="pointer-events-none absolute inset-0 [background-image:radial-gradient(circle_at_1px_1px,theme(colors.zinc.200)_1px,transparent_0)] [background-size:28px_28px] opacity-60 [mask-image:radial-gradient(ellipse_70%_55%_at_50%_0%,#000_60%,transparent_100%)]"
+          className="pointer-events-none absolute inset-0 z-0 bg-gradient-to-b from-white/45 via-white/40 to-white"
         />
         <div
           aria-hidden
-          className="pointer-events-none absolute left-1/2 top-0 -z-0 h-72 w-[42rem] -translate-x-1/2 rounded-full bg-gradient-to-b from-zinc-200/50 to-transparent blur-3xl"
+          className="pointer-events-none absolute left-1/2 top-10 z-0 h-72 w-[42rem] -translate-x-1/2 rounded-full bg-gradient-to-b from-slate-200/40 to-transparent blur-3xl"
         />
 
-        <img className="h-100 left-[calc(50vw-200px)] opacity-50 absolute" src="/logo.png"/>
-
-        <div className="relative mx-auto max-w-6xl px-6 py-24 text-center sm:py-20">
+        <div className="relative z-10 mx-auto w-full max-w-6xl px-6 py-20 text-center">
           <motion.div
             initial="hidden"
             animate="show"
             variants={fadeUp}
             className="mx-auto max-w-3xl"
           >
-           
+            <span className="inline-flex items-center gap-2 rounded-full border-slate-200 bg-white px-4 py-3 text-xs font-semibold text-slate-600 backdrop-blur">
+              <span className="flex h-1.5 w-1.5 rounded-full bg-emerald-500 not-sm:hidden" />
+               A tool every person with people who rely on them need — built by a team of ex-crypto security engineers
+            </span>
 
             <h1 className="mt-6 text-balance text-5xl leading-[1.1] tracking-tighter text-black sm:text-7xl">
-              Ensure your digital assets reach the right people.{" "}
-              <span className="bg-gradient-to-r from-zinc-600 to-zinc-300 bg-clip-text text-transparent">
-                Automatically.
+              Your digital information shouldn't die{" "}
+              <span className="bg-gradient-to-r from-slate-600 to-slate-300 bg-clip-text text-transparent">
+                with you.
               </span>
             </h1>
 
-            <p className="mx-auto mt-8 max-w-2xl text-pretty text-lg leading-relaxed text-zinc-600 sm:text-xl">
-              Safely hand over passwords, bank accounts, files,
-              crypto keys, final messages and wishes using a system that unlocks only if you
-              go silent.
+            <p className="mx-auto mt-8 max-w-2xl text-pretty text-lg leading-relaxed text-slate-600 sm:text-xl">
+              Safely hand over passwords, bank accounts, files, crypto keys, and
+              final messages to the people you choose — using an encrypted vault
+              that unlocks{" "}
+              <span className="font-semibold text-slate-900">only if you go silent.</span>
             </p>
 
             <div className="mt-12 flex flex-col items-center justify-center gap-3 sm:flex-row sm:gap-4">
-              <Link
-                href="/login"
-                // className="group inline-flex h-12 w-full items-center justify-center gap-2 rounded-xl bg-zinc-950 px-7 text-base font-medium text-white shadow-lg shadow-zinc-950/10 transition-all hover:bg-zinc-800 active:scale-[0.98] sm:w-auto"
-              >
-                <Button className="h-12 px-8">
-                  Protect Your Legacy
-                <ArrowRightIcon
-                  size={18}
-                  weight="bold"
-                  className="transition-transform group-hover:translate-x-0.5"
-                />
+              <Link href="/login" className="group w-full sm:w-auto">
+                <Button className="h-14 w-full gap-2 px-8 sm:w-auto">
+                  Protect Your Legacy for Free
+                  <ArrowRightIcon
+                    size={18}
+                    weight="bold"
+                    className="transition-transform group-hover:translate-x-0.5"
+                  />
                 </Button>
               </Link>
-              <Link
-                href="#process-steps"
-                // className="inline-flex h-12 w-full items-center justify-center rounded-xl border border-zinc-200 bg-white px-7 text-base font-medium text-zinc-700 transition-colors hover:bg-zinc-50 hover:text-zinc-900 sm:w-auto"
-              >
-                <Button className="h-12 px-8" variant="outline">
-                  See How It Works
+              <Link href="#demo-video" className="w-full sm:w-auto">
+                <Button variant="secondary" className="h-14 w-full gap-2 px-8 sm:w-auto">
+                  <PlayCircleIcon className="size-6" weight="fill" />
+                  Watch 5 min demo
                 </Button>
               </Link>
             </div>
 
             {/* Trust row */}
-            <div className="mt-14 flex flex-wrap items-center justify-center gap-x-6 gap-y-3 text-xs font-medium text-zinc-500">
-              <span className="inline-flex items-center gap-3 ">
-                <FingerprintIcon size={20} weight="duotone" /> Zero-knowledge encryption
+            <div className="mt-14 flex flex-wrap items-center justify-center gap-x-6 gap-y-3 text-xs font-medium text-slate-500">
+              <span className="inline-flex items-center gap-2">
+                <FingerprintIcon size={18} weight="duotone" /> Zero-knowledge encryption
               </span>
-              <span className="hidden h-3.5 bg-zinc-200 sm:block" />
-              <span className="inline-flex items-center gap-3">
-                <GithubLogoIcon size={20} /> 100% open source
+              <span className="hidden h-3.5 w-px bg-slate-200 sm:block" />
+              <span className="inline-flex items-center gap-2">
+                <GithubLogoIcon size={18} /> 100% open source
               </span>
-              <span className="hidden h-3.5 bg-zinc-200 sm:block" />
-              <span className="inline-flex items-center gap-3">
-                <KeyIcon size={20} /> AES-256 client-side
+              <span className="hidden h-3.5 w-px bg-slate-200 sm:block" />
+              <span className="inline-flex items-center gap-2">
+                <KeyIcon size={18} /> AES-256 client-side
               </span>
             </div>
           </motion.div>
         </div>
       </section>
 
-      {/* Core mechanics */}
+      {/* ---------------------------------------------------------- */}
+      {/* Hero Video                                                 */}
+      {/* ---------------------------------------------------------- */}
+      <section id="demo-video" className="relative w-full py-20">
+        <div className="mx-auto max-w-5xl px-6">
+          <h1 className="text-4xl text-slate-900 mb-12 w-full text-center">How it works</h1>
+          <motion.div
+            variants={fadeUp}
+            initial="hidden"
+            whileInView="show"
+            viewport={{ once: true, margin: "-100px" }}
+            className="relative overflow-hidden rounded-3xl border border-slate-200 bg-slate-950 shadow-2xl shadow-slate-950/20"
+          >
+            <video
+              className="aspect-video w-full"
+              controls
+              playsInline
+              preload="metadata"
+              poster="/herovideo-poster.png"
+            >
+              <source src="/hero.mov" type="video/mp4" />
+              Your browser does not support the video tag.
+            </video>
+          </motion.div>
+          <p className="mt-4 text-center text-sm text-slate-500">
+            See exactly how your vault is built, checked, and released — in under 5 minutes.
+          </p>
+        </div>
+      </section>
+
+      {/* ---------------------------------------------------------- */}
+      {/* Trust stats bar                                            */}
+      {/* ---------------------------------------------------------- */}
+      <section className="w-full border-slate-300 bg-slate-50">
+        <div className="mx-auto grid max-w-6xl grid-cols-2 gap-px px-6 py-12 sm:grid-cols-4">
+          {TRUST_STATS.map((stat, idx) => (
+            <motion.div
+              key={idx}
+              variants={fadeUp}
+              initial="hidden"
+              whileInView="show"
+              viewport={{ once: true }}
+              custom={idx}
+              className="flex flex-col items-center text-center"
+            >
+              <span className="text-3xl tracking-tight text-slate-950 sm:text-5xl">
+                {stat.value}
+              </span>
+              <span className="mt-4 text-xs font-medium text-slate-500">{stat.label}</span>
+            </motion.div>
+          ))}
+        </div>
+      </section>
+
+      {/* ---------------------------------------------------------- */}
+      {/* Reviews                                                    */}
+      {/* ---------------------------------------------------------- */}
+      <section className="w-full bg-white py-24 sm:py-28">
+        <div className="mx-auto max-w-6xl px-6">
+          <div className="mb-14 text-center">
+            <span className="text-xs font-bold uppercase tracking-[0.2em] text-slate-400">
+              Loved by people with something to lose
+            </span>
+            <h2 className="mt-3 text-4xl tracking-tight text-slate-950 sm:text-4xl">
+              Peace of mind, encrypted
+            </h2>
+          </div>
+
+          <div className="grid gap-6 lg:grid-cols-3">
+            {REVIEWS.map((review, idx) => (
+              <motion.figure
+                key={idx}
+                variants={fadeUp}
+                initial="hidden"
+                whileInView="show"
+                viewport={{ once: true, margin: "-80px" }}
+                custom={idx}
+                className="flex flex-col justify-between rounded-3xl border-2 border-slate-200/80 p-8"
+              >
+                <div>
+                  <div className="flex gap-0.5 text-amber-400">
+                    {Array.from({ length: 5 }).map((_, i) => (
+                      <StarIcon key={i} size={20} weight="fill" />
+                    ))}
+                  </div>
+                  <blockquote className="mt-4 text-pretty text-sm leading-relaxed text-slate-700">
+                    "{review.quote}"
+                  </blockquote>
+                </div>
+                <figcaption className="mt-6 flex items-center gap-3">
+                  <span className="flex h-10 w-10 items-center justify-center overflow-hidden rounded-full bg-slate-200 text-sm font-bold text-slate-500">
+                    <User className="size-5"/>
+                  </span>
+                  <div className="leading-tight">
+                    <p className="text-sm font-semibold text-slate-900">{review.name}</p>
+                    <p className="text-xs text-slate-500">{review.role}</p>
+                  </div>
+                </figcaption>
+              </motion.figure>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* ---------------------------------------------------------- */}
+      {/* How it works — steps with image placeholders               */}
+      {/* ---------------------------------------------------------- */}
       <div id="process-steps" className="w-full">
+        <div className="mx-auto max-w-6xl px-6 pt-8 text-center">
+          <span className="text-xs font-bold uppercase tracking-[0.2em] text-slate-400">
+            How it works
+          </span>
+          <h2 className="mx-auto mt-3 max-w-2xl text-3xl tracking-tight text-slate-950 sm:text-5xl">
+            Three steps and 10 minutes between you and a worry-free legacy
+          </h2>
+        </div>
+
         {HOW_IT_WORKS_SECTIONS.map((section, idx) => {
           const Icon = section.Icon;
+          const dark = idx === 2;
           return (
             <section
               key={idx}
-              className={`flex w-full items-center py-24 sm:py-32 ${
-                section.dark
+              className={`flex w-full items-center py-20 sm:py-28 ${
+                dark
                   ? "bg-zinc-950 text-white"
                   : idx === 1
-                  ? "bg-zinc-50 text-zinc-900 border-y border-zinc-100"
-                  : "bg-white text-zinc-900"
+                  ? "bg-slate-50 text-slate-900"
+                  : "bg-white text-slate-900"
               }`}
             >
               <div className="mx-auto w-full max-w-6xl px-6">
@@ -237,24 +543,20 @@ export default function Home() {
                     <div className="flex items-center gap-5">
                       <span
                         className={`flex size-16 items-center justify-center rounded-xl ${
-                          section.dark
+                          dark
                             ? "bg-white/10 text-white ring-1 ring-white/10"
-                            : "bg-zinc-900 text-white"
+                            : "bg-slate-200 text-black"
                         }`}
                       >
-                        <Icon size={40} weight="fill" />
+                        <Icon size={36} weight="fill" />
                       </span>
                       <div className="flex flex-col">
-                        <span
-                          className={`text-3xl ${
-                            section.dark ? "text-zinc-500" : "text-zinc-400"
-                          }`}
-                        >
-                          Step — <span className="font-extrabold"  >{section.step}</span>
+                        <span className={`text-3xl ${dark ? "text-slate-300" : "text-slate-800"}`}>
+                          Step — {section.step}
                         </span>
                         <span
-                          className={`text-md mt-3 font-semibold ${
-                            section.dark ? "text-zinc-300" : "text-zinc-700"
+                          className={`mt-2 text-sm font-semibold ${
+                            dark ? "text-slate-300" : "text-slate-700"
                           }`}
                         >
                           {section.badge}
@@ -262,161 +564,49 @@ export default function Home() {
                       </div>
                     </div>
 
-                    <h2 className="text-3xl tracking-tighter   sm:text-4xl">
-                      {section.title}
-                    </h2>
-                    <p
-                      className={`text-lg font-medium ${
-                        section.dark ? "text-zinc-300" : "text-zinc-800"
-                      }`}
-                    >
+                    <h3 className="text-3xl tracking-tighter sm:text-4xl">{section.title}</h3>
+                    <p className={`text-lg font-medium ${dark ? "text-slate-300" : "text-zinc-800"}`}>
                       {section.subtitle}
                     </p>
-                    <p
-                      className={`text-base leading-relaxed ${
-                        section.dark ? "text-zinc-400" : "text-zinc-600"
-                      }`}
-                    >
+                    <p className={`text-base leading-relaxed ${dark ? "text-slate-400" : "text-slate-600"}`}>
                       {section.description}
                     </p>
                   </motion.div>
 
-                  {/* Visual */}
+                  {/* Image placeholder — swap src for your own screenshot */}
                   <motion.div
-                    variants={fadeUp}
-                    initial="hidden"
-                    whileInView="show"
-                    viewport={{ once: true, margin: "-120px" }}
-                    custom={1}
-                    className="w-full lg:col-span-6"
-                  >
-                    <div
-                      className={`relative flex aspect-[4/3] w-full flex-col items-center justify-center overflow-hidden p-8 ${
-                        section.dark
-                          ? "border-zinc-800 bg-gradient-to-br from-zinc-900 to-black"
-                          : "border-zinc-200 bg-zinc-100"
-                      }`}
-                    >
-                      <div
-                        aria-hidden
-                        className={`absolute -bottom-12 -right-12 h-44 w-44 rounded-full blur-3xl ${
-                          section.dark ? "bg-zinc-700/20" : "bg-zinc-300/30"
-                        }`}
-                      />
-
-                      {/* Vault */}
-                      {section.placeholderType === "vault" && (
-                        <div className="relative w-full max-w-sm space-y-4 select-none">
-                          <div className="space-y-2.5 border-zinc-200/80 bg-white p-10">
-                          <CursorIcon className="size-12 absolute translate-x-79 translate-y-27" weight="fill"/> 
-                            <p className="flex items-center gap-2 text-lg text-zinc-900">
-                              <VaultIcon size={24} className="text-zinc-700" />
-                              Encrypted Vault Input
-                            </p>
-                            <div className="flex h-9 items-center gap-2 rounded-lg border border-dashed border-zinc-200 bg-zinc-50 px-3 text-xs text-zinc-500">
-                              <KeyIcon size={15} weight="duotone" />
-                              My Bitcoin Seed Phrase…
-                            </div>
-                            <div className="flex h-9 items-center gap-2 rounded-lg border border-dashed border-zinc-200 bg-zinc-50 px-3 text-xs text-zinc-500">
-                              <WalletIcon size={15} weight="duotone" />
-                              Master Password Logins…
-                            </div>
-                          </div>
-                          <p className="text-center text-[11px] text-zinc-500">
-                            Encrypted before stored on our servers
-                          </p>
-                        </div>
-                      )}
-
-                      {/* Timer with animated ring */}
-                      {section.placeholderType === "timer" && (
-                        <div className="relative flex flex-col items-center gap-5 text-center w-full">
-                          <div className="relative h-32 w-32">
-                            <svg viewBox="0 0 120 120" className="h-full w-full -rotate-90">
-                              <circle
-                                cx="60"
-                                cy="60"
-                                r="52"
-                                fill="none"
-                                stroke="currentColor"
-                                strokeWidth="8"
-                                className="text-zinc-200"
-                              />
-                              <motion.circle
-                                cx="60"
-                                cy="60"
-                                r="52"
-                                fill="none"
-                                stroke="currentColor"
-                                strokeWidth="8"
-                                strokeLinecap="round"
-                                className="text-zinc-900"
-                                strokeDasharray={2 * Math.PI * 52}
-                                initial={{ strokeDashoffset: 2 * Math.PI * 52 }}
-                                whileInView={{ strokeDashoffset: 2 * Math.PI * 300 * 0.2 }}
-                                viewport={{ once: true }}
-                                transition={{ duration: 1.4, ease: "easeOut" }}
-                              />
-                            </svg>
-                            <div className="absolute inset-0 flex flex-col items-center justify-center">
-                              <ClockCountdownIcon size={22} className="text-zinc-500" />
-                              <span className="mt-1 text-2xl font-bold text-zinc-900">3d</span>
-                              <span className="text-[10px] font-extrabold uppercase tracking-wide text-zinc-600">
-                                left
-                              </span>
-                            </div>
-                          </div>
-                          <div className="space-y-1 w-full px-4">
-                            <p className="text-lg mb-6 text-zinc-800">
-                              Stop false triggers with constant reminders
-                            </p>
-                            <div className="w-full px-5 py-3.5 flex items-center space-x-3 overflow-hidden rounded-full bg-zinc-900">
-                               <PaperPlane className="size-7 text-white" />
-                               <div className="flex flex-col items-start text-left text-white">
-                                <div className="flex items-center space-x-3">
-                                <div className="size-2 rounded-full animate-pulse bg-red-400"></div>
-                                <div className="flex flex-col space-y-0.5  py-1  ">
-                                  <h1 className="text-zinc-400 text-sm">From: notify@yourcyberwill.com</h1>
-                                <h1 className="text-zinc-200 text-sm font-semibold">To: john23@gmail.com</h1>
-                                  </div>
-                                </div>
-                                <span className="ml-3.5 font-bold">John, check-in now!</span>
-                              </div>
-                              
-                               </div>
-                          </div>
-                        </div>
-                      )}
-
-                      {/* Release */}
-                      {section.placeholderType === "release" && (
-                        <div className="relative w-full max-w-sm space-y-4">
-                          <div className="space-y-3 rounded-2xl border border-zinc-800 bg-zinc-900 p-4 shadow-2xl">
-                            <p className="flex items-center gap-2 text-xs font-semibold text-zinc-200">
-                              <EnvelopeOpenIcon size={16} weight="duotone" className="text-zinc-400" />
-                              Incoming Legacy Notice
-                            </p>
-                            <div className="flex items-center justify-between gap-2 rounded-lg border border-zinc-800 bg-black px-3 py-2.5">
-                              <span className="flex items-center gap-1.5 text-[11px] text-emerald-400 underline">
-                                <LinkSimpleIcon size={14} weight="bold" />
-                                secure-vault-access.link
-                              </span>
-                              <span className="rounded-md border border-red-900/50 bg-red-950/40 px-1.5 py-0.5 text-[10px] text-red-400">
-                                15 days left
-                              </span>
-                            </div>
-                            <div className="flex items-center gap-2 text-[11px] text-zinc-500">
-                              <UsersFourIcon size={15} weight="duotone" />
-                              Delivered to 3 designated beneficiaries
-                            </div>
-                          </div>
-                          <p className="text-center text-[11px] text-zinc-500">
-                            Vault key access permanently self-destructs on day 16
-                          </p>
-                        </div>
-                      )}
-                    </div>
-                  </motion.div>
+  variants={fadeUp}
+  initial="hidden"
+  whileInView="show"
+  viewport={{ once: true, margin: "-120px" }}
+  custom={1}
+  className="w-full lg:col-span-6"
+>
+  {/* REMOVED h-120 so the container adapts to the image height */}
+  <div
+    className={`group relative flex items-center justify-center rounded-3xl overflow-hidden ${
+      dark ? "border-slate-800 bg-slate-900" : "border-2 p-4 border-slate-200 bg-white"
+    }`}
+  >
+    <img
+      src={section.image}
+      alt={section.title || "Section asset"}
+      className="w-full h-auto block rounded-2xl" // w-full and h-auto ensures 100% visibility
+    />
+    
+    {/* Fallback shown only if image is missing */}
+    <div
+      className={`absolute inset-0 hidden flex-col items-center justify-center gap-3 ${
+        dark ? "text-slate-600" : "text-slate-400"
+      }`}
+    >
+      <Icon size={48} weight="duotone" />
+      <span className="text-sm font-medium">
+        Place your image at <code>{section.image}</code>
+      </span>
+    </div>
+  </div>
+</motion.div>
                 </div>
               </div>
             </section>
@@ -424,14 +614,115 @@ export default function Home() {
         })}
       </div>
 
-      {/* FAQ */}
-      <section className="w-full border-y border-zinc-200/60 bg-zinc-50 py-24 sm:py-32">
+      {/* ---------------------------------------------------------- */}
+      {/* Features grid                                              */}
+      {/* ---------------------------------------------------------- */}
+      <section id="features" className="w-full border-y border-slate-100 bg-slate-50 py-24 sm:py-28">
+        <div className="mx-auto max-w-6xl px-6">
+          <div className="mb-14 text-center">
+            <span className="text-xs font-bold uppercase tracking-[0.2em] text-slate-400">
+              Why yourcyberwill
+            </span>
+            <h2 className="mt-3 text-3xl tracking-tight text-slate-950 sm:text-5xl">
+              A secure digital life insurance
+            </h2>
+          </div>
+
+          <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
+            {FEATURES.map((feature, idx) => {
+              const Icon = feature.Icon;
+              return (
+                <motion.div
+                  key={idx}
+                  variants={fadeUp}
+                  initial="hidden"
+                  whileInView="show"
+                  viewport={{ once: true, margin: "-60px" }}
+                  custom={idx}
+                  className="rounded-2xl border-slate-200/80 bg-slate-100 p-6 transition-shadow hover:bg-slate-200"
+                >
+                  <span className="flex size-11 items-center justify-center rounded-xl bg-slate-900 text-white">
+                    <Icon size={22} weight="fill" />
+                  </span>
+                  <h3 className="mt-4 text-base font-semibold text-slate-950">{feature.title}</h3>
+                  <p className="mt-2 text-sm leading-relaxed text-slate-600">{feature.text}</p>
+                </motion.div>
+              );
+            })}
+          </div>
+        </div>
+      </section>
+
+      {/* ---------------------------------------------------------- */}
+      {/* Security highlight                                         */}
+      {/* ---------------------------------------------------------- */}
+      <section className="w-full bg-white py-24 sm:py-28">
+        <div className="mx-auto max-w-5xl px-6">
+          <div className="grid items-center gap-10 rounded-3xl border border-slate-200 bg-slate-50/60 p-8 sm:p-12 lg:grid-cols-2 lg:gap-16">
+            <motion.div
+              variants={fadeUp}
+              initial="hidden"
+              whileInView="show"
+              viewport={{ once: true }}
+              className="space-y-5"
+            >
+              <span className="inline-flex items-center gap-2 rounded-full bg-slate-900 px-3 py-2 text-xs font-semibold text-white">
+                <LockKeyIcon size={16} weight="fill" /> Security first
+              </span>
+              <h2 className="text-3xl tracking-tight text-slate-950 sm:text-4xl">
+                We can't read your data — and that's the whole point.
+              </h2>
+              <p className="text-base leading-relaxed text-slate-600">
+                Encryption happens on your device, before anything leaves it. Your
+                master passphrase never reaches our servers, so even under subpoena
+                or breach, your vault stays unreadable.
+              </p>
+            </motion.div>
+
+            <motion.ul
+              variants={fadeUp}
+              initial="hidden"
+              whileInView="show"
+              viewport={{ once: true }}
+              custom={1}
+              className="space-y-4"
+            >
+              {[
+                { Icon: FingerprintIcon, text: "Zero-knowledge AES-256 encryption" },
+                { Icon: DeviceMobileIcon, text: "Encrypts locally, in your browser" },
+                { Icon: ChatCircleTextIcon, text: "Check-in reminders" },
+                { Icon: GithubLogoIcon, text: "Publicly auditable open-source code" },
+                { Icon: HeartIcon, text: "Start for free" },
+              ].map((item, i) => {
+                const Icon = item.Icon;
+                return (
+                  <li
+                    key={i}
+                    className="flex items-center gap-3 rounded-xl border border-slate-200 bg-white px-4 py-3"
+                  >
+                    <span className="flex size-9 shrink-0 items-center justify-center rounded-lg bg-slate-100 text-slate-700">
+                      <Icon size={18} weight="duotone" />
+                    </span>
+                    <span className="text-sm font-medium text-slate-800">{item.text}</span>
+                    <CheckCircleIcon size={18} weight="fill" className="ml-auto text-emerald-500" />
+                  </li>
+                );
+              })}
+            </motion.ul>
+          </div>
+        </div>
+      </section>
+
+      {/* ---------------------------------------------------------- */}
+      {/* FAQ                                                        */}
+      {/* ---------------------------------------------------------- */}
+      <section id="faq" className="w-full border-y border-slate-200/60 bg-slate-50 py-24 sm:py-28">
         <div className="mx-auto max-w-3xl px-6">
           <div className="mb-14 text-center">
-            <span className="text-xs font-bold uppercase tracking-[0.2em] text-zinc-400">
+            <span className="text-xs font-bold uppercase tracking-[0.2em] text-slate-400">
               Common Questions
             </span>
-            <h2 className="mt-3 text-3xl font-extrabold tracking-tight text-zinc-950 sm:text-4xl">
+            <h2 className="mt-3 text-3xl tracking-tight text-slate-950 sm:text-5xl">
               Frequently Asked Questions
             </h2>
           </div>
@@ -442,21 +733,21 @@ export default function Home() {
               return (
                 <div
                   key={idx}
-                  className={`overflow-hidden rounded-2xl border bg-white transition-all ${
+                  className={`overflow-hidden rounded-2xl !cursor-pointer hover:bg-slate-100 bg-white transition-all ${
                     isOpen
-                      ? "border-zinc-300 shadow-md"
-                      : "border-zinc-200/80 shadow-sm hover:border-zinc-300"
+                      ? "border-slate-300 shadow-md"
+                      : "border-slate-200/80 shadow-sm hover:border-slate-300"
                   }`}
                 >
                   <button
                     onClick={() => setOpenFaq(isOpen ? null : idx)}
                     aria-expanded={isOpen}
-                    className="flex w-full items-center justify-between gap-4 px-6 py-5 text-left font-semibold text-zinc-950 transition-colors"
+                    className="flex w-full items-center justify-between gap-4 px-6 py-5 text-left font-semibold text-slate-950 transition-colors"
                   >
                     <span>{faq.question}</span>
                     <span
-                      className={`flex h-7 w-7 shrink-0 items-center justify-center rounded-full text-zinc-400 transition-all duration-300 ${
-                        isOpen ? "rotate-180 bg-zinc-900 text-white" : "bg-zinc-100"
+                      className={`flex h-7 w-7 shrink-0 items-center justify-center rounded-full transition-all duration-300 ${
+                        isOpen ? "rotate-180 bg-zinc-900 text-white" : "bg-slate-100 text-slate-400"
                       }`}
                     >
                       <CaretDownIcon size={16} weight="bold" />
@@ -473,7 +764,7 @@ export default function Home() {
                         transition={{ duration: 0.3, ease: [0.21, 0.47, 0.32, 0.98] }}
                         className="overflow-hidden"
                       >
-                        <p className="border-t border-zinc-100 px-6 py-5 text-sm leading-relaxed text-zinc-600">
+                        <p className="border-t border-slate-100 px-6 py-5 text-sm leading-relaxed text-slate-600">
                           {faq.answer}
                         </p>
                       </motion.div>
@@ -486,27 +777,29 @@ export default function Home() {
         </div>
       </section>
 
-      {/* CTA */}
+      {/* ---------------------------------------------------------- */}
+      {/* Final CTA                                                  */}
+      {/* ---------------------------------------------------------- */}
       <section className="mx-auto w-full max-w-6xl px-6 py-24">
-        <div className="relative overflow-hidden rounded-3xl bg-zinc-950 px-8 py-16 text-center text-white shadow-xl">
+        <div className="relative overflow-hidden rounded-3xl bg-zinc-950 px-8 py-20 text-center text-white shadow-xl">
           <div
             aria-hidden
             className="pointer-events-none absolute inset-0 [background-image:radial-gradient(circle_at_1px_1px,rgba(255,255,255,0.07)_1px,transparent_0)] [background-size:24px_24px] [mask-image:radial-gradient(ellipse_60%_70%_at_50%_50%,#000_40%,transparent_100%)]"
           />
           <div className="relative">
-            <span className="mx-auto mb-5 flex h-12 w-12 items-center justify-center rounded-2xl bg-white/10 ring-1 ring-white/10">
-              <ShieldCheckIcon size={24} weight="duotone" />
-            </span>
-            <h3 className="text-3xl font-bold tracking-tight">
+          <div className="w-full justify-center flex">
+            <img className="w-45 invert mb-4" src={"/logo.png"}/>
+          </div>
+            <h3 className="text-3xl tracking-tight sm:text-4xl">
               Ready to secure your digital legacy?
             </h3>
-            <p className="mx-auto mt-4 max-w-md text-zinc-400">
-              Take 10 minutes today to ensure your data and assets aren't locked away
-              forever.
+            <p className="mx-auto mt-6 max-w-md text-slate-300">
+              Take 10 minutes today to make sure your data and assets aren't locked
+              away forever. Quick and easy.
             </p>
             <Link
               href="/login"
-              className="group mt-8 inline-flex h-12 items-center justify-center gap-2 rounded-xl bg-white px-8 text-base font-medium text-zinc-950 shadow-md transition-all hover:bg-zinc-100 active:scale-[0.98]"
+              className="group mt-8 inline-flex h-12 items-center justify-center gap-2 rounded-xl bg-white px-8 text-base font-medium text-slate-950 shadow-md transition-all hover:bg-slate-100 active:scale-[0.98]"
             >
               Get Started Now
               <ArrowRightIcon
@@ -515,12 +808,125 @@ export default function Home() {
                 className="transition-transform group-hover:translate-x-0.5"
               />
             </Link>
+            <p className="mt-4 text-xs text-slate-500">
+              Free to start · No card required · Open source
+            </p>
           </div>
         </div>
       </section>
 
+      {/* ---------------------------------------------------------- */}
+      {/* Pricing — placed just above the footer                     */}
+      {/* ---------------------------------------------------------- */}
+      <section id="pricing" className="w-full border-t border-slate-100 bg-slate-50 py-24 sm:py-28">
+        <div className="mx-auto max-w-6xl px-6">
+          <div className="mb-14 text-center">
+            <span className="text-xs font-bold uppercase tracking-[0.2em] text-slate-400">
+              Pricing
+            </span>
+            <h2 className="mt-3 text-3xl font-extrabold tracking-tight text-slate-950 sm:text-4xl">
+              Simple plans for total peace of mind
+            </h2>
+            <p className="mx-auto mt-4 max-w-xl text-base leading-relaxed text-slate-600">
+              Start free, upgrade when you're ready. No hidden fees, cancel anytime.
+            </p>
+          </div>
+
+          <div className="grid items-stretch gap-6 lg:grid-cols-3">
+            {PRICING.map((plan, idx) => (
+              <motion.div
+                key={idx}
+                variants={fadeUp}
+                initial="hidden"
+                whileInView="show"
+                viewport={{ once: true, margin: "-60px" }}
+                custom={idx}
+                className={`relative flex flex-col rounded-3xl p-8 ${
+                  plan.highlighted
+                    ? "border-slate-900 bg-zinc-900 text-white shadow-xl"
+                    : "border-slate-200/80 bg-white text-slate-900"
+                }`}
+              >
+                {plan.highlighted && (
+                  <span className="absolute -top-3 left-1/2 -translate-x-1/2 rounded-full bg-amber-200 px-4 py-1 text-xs font-bold uppercase tracking-wide text-amber-800 shadow">
+                    Most popular
+                  </span>
+                )}
+
+                <h3
+                  className={`text-xl ${
+                    plan.highlighted ? "text-white" : "text-slate-950"
+                  }`}
+                >
+                  {plan.name}
+                </h3>
+                <p
+                  className={`mt-1 text-sm ${
+                    plan.highlighted ? "text-slate-400" : "text-slate-500"
+                  }`}
+                >
+                  {plan.description}
+                </p>
+
+                <div className="mt-6 flex items-baseline gap-1">
+                  <span className="text-5xl tracking-tight">{plan.price}</span>
+                  <span
+                    className={`text-sm font-medium ${
+                      plan.highlighted ? "text-slate-400" : "text-slate-500"
+                    }`}
+                  >
+                    {plan.period}
+                  </span>
+                </div>
+
+                <ul className="mt-8 space-y-3">
+                  {plan.features.map((feat, i) => (
+                    <li key={i} className="flex items-start gap-3 text-sm">
+                      <CheckCircleIcon
+                        size={18}
+                        weight="fill"
+                        className={`mt-0.5 shrink-0 ${
+                          plan.highlighted ? "text-emerald-400" : "text-emerald-500"
+                        }`}
+                      />
+                      <span
+                        className={plan.highlighted ? "text-slate-200" : "text-slate-700"}
+                      >
+                        {feat}
+                      </span>
+                    </li>
+                  ))}
+                </ul>
+
+                <div className="mt-8 pt-2">
+                  <Link href="/login" className="group block">
+                    <Button
+                      variant={plan.highlighted ? "default" : "outline"}
+                      className={`h-12 w-full gap-2 ${
+                        plan.highlighted ? "bg-white text-slate-950 hover:bg-slate-100" : ""
+                      }`}
+                    >
+                      {plan.cta}
+                      <ArrowRightIcon
+                        size={18}
+                        weight="bold"
+                        className="transition-transform group-hover:translate-x-0.5"
+                      />
+                    </Button>
+                  </Link>
+                </div>
+              </motion.div>
+            ))}
+          </div>
+
+          <p className="mt-10 text-center text-xs text-slate-500">
+            All premium plans (Monthly, Yearly, Lifetime) are the exact same
+          </p>
+        </div>
+      </section>
+
       {/* Footer */}
-      <Footer/>
+      <Footer />
     </div>
   );
 }

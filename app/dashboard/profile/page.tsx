@@ -41,7 +41,7 @@ export default async function ProfilePage() {
         <div className="space-y-1">
           <Link
             href="/dashboard"
-            className="text-sm text-zinc-500 hover:text-zinc-800 dark:hover:text-zinc-200"
+            className="text-sm text-slate-500 hover:text-slate-800 dark:hover:text-slate-200"
           >
             ← Dashboard
           </Link>
@@ -49,7 +49,7 @@ export default async function ProfilePage() {
             Profile
             {profile.subscription_active && <PremiumBadge />}
           </h1>
-          <p className="text-zinc-600 dark:text-zinc-400">
+          <p className="text-slate-600 dark:text-slate-400">
             Your account details and bio.
           </p>
         </div>

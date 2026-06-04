@@ -39,17 +39,17 @@ export function VaultMarkdown({ content }: { content: string }) {
             </a>
           ),
           code: ({ children }) => (
-            <code className="rounded bg-zinc-200 px-1 py-0.5 font-mono text-xs dark:bg-zinc-800">
+            <code className="rounded bg-slate-200 px-1 py-0.5 font-mono text-xs dark:bg-slate-800">
               {children}
             </code>
           ),
           pre: ({ children }) => (
-            <pre className="my-2 overflow-x-auto rounded-lg bg-zinc-100 p-3 font-mono text-xs dark:bg-zinc-900">
+            <pre className="my-2 overflow-x-auto rounded-lg bg-slate-100 p-3 font-mono text-xs dark:bg-slate-900">
               {children}
             </pre>
           ),
           blockquote: ({ children }) => (
-            <blockquote className="my-2 border-l-4 border-zinc-300 pl-3 text-zinc-600 dark:border-zinc-600 dark:text-zinc-400">
+            <blockquote className="my-2 border-l-4 border-slate-300 pl-3 text-slate-600 dark:border-slate-600 dark:text-slate-400">
               {children}
             </blockquote>
           ),

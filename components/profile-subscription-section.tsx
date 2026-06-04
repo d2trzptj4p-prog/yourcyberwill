@@ -19,9 +19,9 @@ export function ProfileSubscriptionSection({
   );
 
   return (
-    <section className="rounded-2xl border-2 border-slate-200 p-6 dark:border-zinc-800">
+    <section className="rounded-2xl border-2 border-slate-200 p-6 dark:border-slate-800">
       <h2 className="text-lg font-medium">Subscription</h2>
-      <p className="mt-1 text-sm text-zinc-600 dark:text-zinc-400">
+      <p className="mt-1 text-sm text-slate-600 dark:text-slate-400">
         {profile.subscription_active
           ? "You’re on Premium. Update payment method, view invoices, or cancel in the Polar customer portal."
           : canManagePortal
@@ -35,7 +35,7 @@ export function ProfileSubscriptionSection({
         ) : (
           <Link
             href="/dashboard"
-            className="inline-flex h-11 items-center justify-center rounded-full bg-zinc-900 px-6 text-sm font-medium text-white transition-colors hover:bg-zinc-700 dark:bg-zinc-100 dark:text-zinc-900 dark:hover:bg-zinc-300"
+            className="inline-flex h-11 items-center justify-center rounded-full bg-slate-900 px-6 text-sm font-medium text-white transition-colors hover:bg-slate-700 dark:bg-slate-100 dark:text-slate-900 dark:hover:bg-slate-300"
           >
             Subscribe on dashboard
           </Link>

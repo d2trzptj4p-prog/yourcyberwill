@@ -44,16 +44,16 @@ export function CheckInPeriodSelector({
         <div className="space-y-4 py-4">
           <RadioGroup value={selectedDays.toString()} onValueChange={(v) => setSelectedDays(Number(v))}>
             {CHECK_IN_PERIODS.map((period) => (
-              <div key={period.days} className="flex items-center space-x-3 rounded-lg border border-zinc-200 p-4 cursor-pointer hover:bg-zinc-50 dark:border-zinc-700 dark:hover:bg-zinc-900">
+              <div key={period.days} className="flex items-center space-x-3 rounded-lg border border-slate-200 p-4 cursor-pointer hover:bg-slate-50 dark:border-slate-700 dark:hover:bg-slate-900">
                 <RadioGroupItem value={period.days.toString()} id={`period-${period.days}`} />
                 <label
                   htmlFor={`period-${period.days}`}
                   className="flex-1 cursor-pointer"
                 >
-                  <div className="font-medium text-zinc-900 dark:text-zinc-100">
+                  <div className="font-medium text-slate-900 dark:text-slate-100">
                     {period.label}
                   </div>
-                  <p className="text-sm text-zinc-500 dark:text-zinc-400">
+                  <p className="text-sm text-slate-500 dark:text-slate-400">
                     {period.description}
                   </p>
                 </label>
@@ -61,7 +61,7 @@ export function CheckInPeriodSelector({
             ))}
           </RadioGroup>
 
-          <p className="text-xs text-zinc-500 dark:text-zinc-400 pt-2">
+          <p className="text-xs text-slate-500 dark:text-slate-400 pt-2">
             You can change this period later if needed. Your recipients will be notified if you don't check in by your due date.
           </p>
         </div>
@@ -77,7 +77,7 @@ export function CheckInPeriodSelector({
           <Button
             onClick={handleConfirm}
             disabled={loading}
-            className="bg-zinc-900 text-white hover:bg-zinc-800 dark:bg-zinc-100 dark:text-zinc-900 dark:hover:bg-zinc-200"
+            className="bg-slate-900 text-white hover:bg-slate-800 dark:bg-slate-100 dark:text-slate-900 dark:hover:bg-slate-200"
           >
             {loading ? "Starting…" : "Start Check-ins"}
           </Button>

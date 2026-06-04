@@ -50,7 +50,7 @@ export function ProfileForm({ profile }: ProfileFormProps) {
       <div className="grid gap-6 sm:grid-cols-2">
         <Field label="Email" value={profile.email ?? "—"} />
         <div className="space-y-2">
-          <label htmlFor="fullName" className="block text-xs font-semibold uppercase tracking-wide text-zinc-600 dark:text-zinc-400">
+          <label htmlFor="fullName" className="block text-xs font-semibold uppercase tracking-wide text-slate-600 dark:text-slate-400">
             Full name
           </label>
           <Input
@@ -59,7 +59,7 @@ export function ProfileForm({ profile }: ProfileFormProps) {
             value={fullName}
             onChange={(e) => setFullName(e.target.value)}
             placeholder="Your name"
-            className="rounded-lg border border-zinc-300 bg-white px-4 py-3 dark:border-zinc-700 dark:bg-zinc-900"
+            className="rounded-lg border border-slate-300 bg-white px-4 py-3 dark:border-slate-700 dark:bg-slate-900"
           />
         </div>
       </div>
@@ -75,7 +75,7 @@ export function ProfileForm({ profile }: ProfileFormProps) {
           value={bio}
           onChange={(event) => setBio(event.target.value)}
           placeholder="Tell us a bit about yourself..."
-          className="w-full resize-y rounded-lg border border-zinc-300 bg-white px-4 py-3 text-sm text-black outline-none ring-zinc-400 focus:ring-2 dark:border-zinc-700 dark:bg-zinc-900 dark:text-white"
+          className="w-full resize-y rounded-lg border border-slate-300 bg-white px-4 py-3 text-sm text-black outline-none ring-slate-400 focus:ring-2 dark:border-slate-700 dark:bg-slate-900 dark:text-white"
         />
       </div>
 
@@ -83,7 +83,7 @@ export function ProfileForm({ profile }: ProfileFormProps) {
         <Button
           type="submit"
           disabled={status === "saving"}
-          className="inline-flex h-10 items-center justify-center rounded-lg bg-black px-6 text-sm font-medium text-white transition-colors hover:bg-zinc-800 disabled:opacity-60 dark:bg-white dark:text-black dark:hover:bg-zinc-200"
+          className="inline-flex h-10 items-center justify-center rounded-lg bg-black px-6 text-sm font-medium text-white transition-colors hover:bg-slate-800 disabled:opacity-60 dark:bg-white dark:text-black dark:hover:bg-slate-200"
         >
           {status === "saving" ? "Saving…" : "Save Changes"}
         </Button>
@@ -107,10 +107,10 @@ export function ProfileForm({ profile }: ProfileFormProps) {
 function Field({ label, value }: { label: string; value: string }) {
   return (
     <div className="space-y-2">
-      <span className="block text-xs font-semibold uppercase tracking-wide text-zinc-600 dark:text-zinc-400">
+      <span className="block text-xs font-semibold uppercase tracking-wide text-slate-600 dark:text-slate-400">
         {label}
       </span>
-      <div className="rounded-lg border border-zinc-300 bg-zinc-50 px-4 py-3 dark:border-zinc-700 dark:bg-zinc-900">
+      <div className="rounded-lg border border-slate-300 bg-slate-50 px-4 py-3 dark:border-slate-700 dark:bg-slate-900">
         <span className="text-sm text-black dark:text-white">{value}</span>
       </div>
     </div>

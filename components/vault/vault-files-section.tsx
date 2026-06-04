@@ -187,10 +187,10 @@ export function VaultFilesSection() {
   }
 
   return (
-    <section className="rounded-2xl border border-zinc-200 p-6 bg-white">
+    <section className="rounded-2xl border border-slate-200 p-6 bg-white">
       <div>
-        <h2 className="text-lg font-semibold text-zinc-900">Files</h2>
-        <p className="mt-1 text-sm text-zinc-500">
+        <h2 className="text-lg font-semibold text-slate-900">Files</h2>
+        <p className="mt-1 text-sm text-slate-500">
           Encrypted in your browser, then stored securely on our servers.{" "}
           {tier ? (
             <>
@@ -207,22 +207,22 @@ export function VaultFilesSection() {
 
       <form
         onSubmit={handleUpload}
-        className="mt-4 flex flex-wrap items-end gap-3 rounded-xl border border-zinc-200 bg-zinc-50 p-4"
+        className="mt-4 flex flex-wrap items-end gap-3 rounded-xl border border-slate-200 bg-slate-50 p-4"
       >
-        <label className="flex min-w-[12rem] flex-1 flex-col gap-1 text-sm text-zinc-800">
+        <label className="flex min-w-[12rem] flex-1 flex-col gap-1 text-sm text-slate-800">
           <span className="font-medium">Upload file</span>
           <input
             id="vault-file-input"
             type="file"
             onChange={onFileChange}
             disabled={storageFull || !tier || locked}
-            className="text-xs file:mr-3 file:rounded-full file:border-0 file:bg-zinc-200 file:px-3 file:py-1.5 disabled:opacity-50 text-zinc-600"
+            className="text-xs file:mr-3 file:rounded-full file:border-0 file:bg-slate-200 file:px-3 file:py-1.5 disabled:opacity-50 text-slate-600"
           />
         </label>
         <Button
           type="submit"
           disabled={uploading || !pendingFile || storageFull || !tier || locked}
-          className="rounded-full bg-zinc-900 px-4 py-2 text-sm font-medium text-white disabled:opacity-60 hover:bg-zinc-800"
+          className="rounded-full bg-slate-900 px-4 py-2 text-sm font-medium text-white disabled:opacity-60 hover:bg-slate-800"
         >
           {uploading ? "Encrypting & uploading…" : "Encrypt & upload"}
         </Button>
@@ -244,7 +244,7 @@ export function VaultFilesSection() {
       {loadError && <p className="mt-2 text-sm text-red-600">{loadError}</p>}
 
       {!loadError && items.length === 0 && (
-        <p className="mt-4 text-sm text-zinc-500">No files saved yet.</p>
+        <p className="mt-4 text-sm text-slate-500">No files saved yet.</p>
       )}
 
       <ul className="mt-4 space-y-2">
@@ -253,16 +253,16 @@ export function VaultFilesSection() {
           return (
             <li
               key={file.id}
-              className="rounded-xl border border-zinc-200 bg-white"
+              className="rounded-xl border border-slate-200 bg-white"
             >
               <div className="flex flex-wrap items-center justify-between gap-2 px-4 py-3">
-                <span className="text-sm font-medium text-zinc-900">{file.name}</span>
+                <span className="text-sm font-medium text-slate-900">{file.name}</span>
                 <div className="flex gap-3 text-sm">
                   <Button
                     type="button"
                     onClick={() => setPreviewId(open ? null : file.id)}
                     variant="ghost"
-                    className="text-zinc-600 hover:bg-zinc-100 hover:text-zinc-900 hover:underline"
+                    className="text-slate-600 hover:bg-slate-100 hover:text-slate-900 hover:underline"
                   >
                     {open ? "Hide" : "Preview"}
                   </Button>
@@ -278,7 +278,7 @@ export function VaultFilesSection() {
                 </div>
               </div>
               {open && (
-                <div className="border-t border-zinc-200 px-4 py-3">
+                <div className="border-t border-slate-200 px-4 py-3">
                   <VaultAttachment attachment={file} />
                 </div>
               )}

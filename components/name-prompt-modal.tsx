@@ -58,11 +58,11 @@ export function NamePromptModal({
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
-      <div className="w-full max-w-sm rounded-lg border border-zinc-200 bg-white p-6 dark:border-zinc-800 dark:bg-black">
+      <div className="w-full max-w-sm rounded-lg border border-slate-200 bg-white p-6 dark:border-slate-800 dark:bg-black">
         <h2 className="text-lg font-semibold text-black dark:text-white">
           Complete Your Profile
         </h2>
-        <p className="mt-1 text-sm text-zinc-600 dark:text-zinc-400">
+        <p className="mt-1 text-sm text-slate-600 dark:text-slate-400">
           Let us know your name so we can personalize your experience.
         </p>
 
@@ -70,7 +70,7 @@ export function NamePromptModal({
           <div>
             <label
               htmlFor="nameInput"
-              className="block text-sm font-medium text-zinc-700 dark:text-zinc-300"
+              className="block text-sm font-medium text-slate-700 dark:text-slate-300"
             >
               Full Name
             </label>

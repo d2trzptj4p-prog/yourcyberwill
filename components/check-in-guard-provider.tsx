@@ -144,14 +144,14 @@ export function CheckInGuardProvider({
           aria-modal="true"
           aria-labelledby="check-in-required-title"
         >
-          <div className="w-full max-w-md rounded-2xl border border-zinc-200 bg-white p-6 shadow-xl dark:border-zinc-700 dark:bg-zinc-900">
+          <div className="w-full max-w-md rounded-2xl border border-slate-200 bg-white p-6 shadow-xl dark:border-slate-700 dark:bg-slate-900">
             <h2
               id="check-in-required-title"
-              className="text-lg font-semibold text-zinc-900 dark:text-zinc-100"
+              className="text-lg font-semibold text-slate-900 dark:text-slate-100"
             >
               {checkIn?.recipients_notified_complete ? "Action not allowed" : "Check in first"}
             </h2>
-            <p className="mt-2 text-sm text-zinc-600 dark:text-zinc-400">
+            <p className="mt-2 text-sm text-slate-600 dark:text-slate-400">
               {lockMessage}
             </p>
             <div className="mt-6 flex flex-wrap gap-3">
@@ -160,7 +160,7 @@ export function CheckInGuardProvider({
                   type="button"
                   onClick={() => setModalOpen(false)}
                   variant="outline"
-                  className="inline-flex h-10 items-center justify-center rounded-full border border-zinc-300 px-5 text-sm font-medium dark:border-zinc-600"
+                  className="inline-flex h-10 items-center justify-center rounded-full border border-slate-300 px-5 text-sm font-medium dark:border-slate-600"
                 >
                   OK
                 </Button>
@@ -179,7 +179,7 @@ export function CheckInGuardProvider({
                     type="button"
                     onClick={() => setModalOpen(false)}
                     variant="outline"
-                    className="inline-flex h-10 items-center justify-center rounded-full border border-zinc-300 px-5 text-sm font-medium dark:border-zinc-600"
+                    className="inline-flex h-10 items-center justify-center rounded-full border border-slate-300 px-5 text-sm font-medium dark:border-slate-600"
                   >
                     Cancel
                   </Button>

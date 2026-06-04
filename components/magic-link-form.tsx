@@ -51,7 +51,7 @@ export function MagicLinkForm() {
       <div className="space-y-2">
         <label
           htmlFor="email"
-          className="block text-sm font-medium text-zinc-700 dark:text-zinc-300"
+          className="block text-sm font-medium text-slate-700 dark:text-slate-300"
         >
           Email Address
         </label>
@@ -63,7 +63,7 @@ export function MagicLinkForm() {
           onChange={(e) => setEmail(e.target.value)}
           disabled={isLoading}
           required
-          className="h-12"
+          className="h-12 bg-white"
         />
       </div>
 

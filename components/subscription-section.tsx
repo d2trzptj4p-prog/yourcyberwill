@@ -22,21 +22,21 @@ const PLANS: Plan[] = [
     id: "monthly",
     name: "Monthly",
     description: "If you expect to use the service for a short time",
-    price: "$16.99",
+    price: "$16",
     period: "/month",
   },
   {
     id: "yearly",
     name: "Yearly",
     description: "Best option for most individuals",
-    price: "$49.99",
+    price: "$46",
     period: "/year",
   },
   {
     id: "lifetime",
     name: "Lifetime",
     description: "Pay once and get ease of mind",
-    price: "$99.99",
+    price: "$86",
     period: "one-time",
     highlighted: true,
   },
@@ -102,15 +102,15 @@ export function SubscriptionSection() {
 
   if (loading) {
     return (
-      <section className="rounded-2xl border border-zinc-200 p-6 dark:border-zinc-800">
-        <p className="text-sm text-zinc-500">Loading subscription…</p>
+      <section className="rounded-2xl border border-slate-200 p-6 dark:border-slate-800">
+        <p className="text-sm text-slate-500">Loading subscription…</p>
       </section>
     );
   }
 
   return (
-    <section className="rounded-3xl bg-slate-100 border-zinc-200 p-6 dark:border-zinc-800">
-      <div className="flex items-center text-zinc-900 dark:text-zinc-100">
+    <section className="rounded-3xl bg-slate-100 border-slate-200 p-6 dark:border-slate-800">
+      <div className="flex items-center text-slate-900 dark:text-slate-100">
         <Crown className="mr-3 size-7 text-black" />
         <h2 className="text-2xl">Premium</h2>
       </div>
@@ -127,8 +127,8 @@ export function SubscriptionSection() {
         key={index} 
         className="rounded-xl bg-slate-200 p-3  px-4"
       >
-        <div className="font-semibold text-zinc-800 dark:text-zinc-200">{item.title}</div>
-        <div className="mt-1 text-xs text-zinc-500">{item.desc}</div>
+        <div className="font-semibold text-slate-800 dark:text-slate-200">{item.title}</div>
+        <div className="mt-1 text-xs text-slate-500">{item.desc}</div>
       </div>
     ))}
   </div>
@@ -160,8 +160,8 @@ export function SubscriptionSection() {
                   onClick={() => setSelectedPlan(plan.id)}
                   className={`cursor-pointer rounded-2xl p-6 transition-all ${
                     selectedPlan === plan.id
-                      ? "border-zinc-900 outline-2 bg-white dark:border-zinc-100 dark:bg-zinc-900"
-                      : "border-zinc-200 bg-white dark:border-zinc-700 dark:bg-zinc-950"
+                      ? "border-slate-900 outline-2 bg-white dark:border-slate-100 dark:bg-slate-900"
+                      : "border-slate-200 bg-white dark:border-slate-700 dark:bg-slate-950"
                   } ${plan.highlighted ? "" : ""}`}
                 >
                   {plan.highlighted && (
@@ -169,17 +169,17 @@ export function SubscriptionSection() {
                       Most Popular
                     </div>
                   )}
-                  <h3 className="text-lg text-zinc-900 dark:text-white">
+                  <h3 className="text-lg text-slate-900 dark:text-white">
                     {plan.name}
                   </h3>
-                  <p className="mt-2 text-sm text-zinc-600 dark:text-zinc-400">
+                  <p className="mt-2 text-sm text-slate-600 dark:text-slate-400">
                     {plan.description}
                   </p>
                   <div className="mt-4">
-                    <span className="text-4xl text-zinc-900 dark:text-white">
+                    <span className="text-4xl text-slate-900 dark:text-white">
                       {plan.price}
                     </span>
-                    <span className="text-sm text-zinc-600 dark:text-zinc-400">
+                    <span className="text-sm text-slate-600 dark:text-slate-400">
                       {plan.period}
                     </span>
                   </div>
@@ -198,7 +198,7 @@ export function SubscriptionSection() {
                 type="button"
                 onClick={handleSubscribe}
                 disabled={checkingOut}
-                className="inline-flex h-13 items-center justify-center rounded-full bg-zinc-900 px-12 text-md font-medium text-white transition-colors hover:bg-zinc-700 disabled:opacity-50 dark:bg-zinc-100 dark:text-zinc-900 dark:hover:bg-zinc-300"
+                className="inline-flex h-13 items-center justify-center rounded-full bg-slate-900 px-12 text-md font-medium text-white transition-colors hover:bg-slate-700 disabled:opacity-50 dark:bg-slate-100 dark:text-slate-900 dark:hover:bg-slate-300"
               >
                 {checkingOut ? "Redirecting…" : "Choose Plan"}
               </Button>

@@ -1,3 +1,4 @@
+
 import Link from "next/link";
 import { redirect } from "next/navigation";
 import { DashboardClient } from "@/components/dashboard-client";
@@ -57,7 +58,7 @@ export default async function DashboardPage({ searchParams }: PageProps) {
             <h1 className="text-2xl font-bold text-black dark:text-white mb-4">
               Profile Error
             </h1>
-            <p className="text-zinc-600 dark:text-zinc-400 mb-4">
+            <p className="text-slate-600 dark:text-slate-400 mb-4">
               Could not load your profile. Please try signing out and signing back in.
             </p>
             <a
@@ -91,7 +92,7 @@ export default async function DashboardPage({ searchParams }: PageProps) {
     <DashboardClient profile={profile}>
       <div className="flex flex-col min-h-screen bg-white dark:bg-black">
         {/* Header */}
-        <header className="border-zinc-200 dark:border-zinc-800">
+        <header className="border-slate-200 dark:border-slate-800">
           <div className="mx-auto flex w-full max-w-5xl items-center justify-between gap-4 px-6 py-6">
             <div className="space-y-2">
               <div className="flex items-center gap-3">
@@ -105,9 +106,11 @@ export default async function DashboardPage({ searchParams }: PageProps) {
           </div>
           </Link>
           </div>
-                {isPremium && <PremiumBadge />}
+                <div className="-translate-x-8">
+                  {isPremium && <PremiumBadge />}
+                </div>
               </div>
-              <p className="text-sm text-zinc-600 dark:text-zinc-400">
+              <p className="text-sm text-slate-600 dark:text-slate-400">
                 Logged in via {user.email} as <span className="font-semibold">{displayName}</span>
               </p>
             </div>
@@ -130,7 +133,7 @@ export default async function DashboardPage({ searchParams }: PageProps) {
             <DashboardVaultLayout profile={profile} />
 
             {/* Account Section */}
-            <section className="rounded-xl border-2 border-slate-200 p-8 dark:border-zinc-800 dark:bg-zinc-900">
+            <section className="rounded-xl border-2 border-slate-200 p-8 dark:border-slate-800 dark:bg-slate-900">
               <div className="space-y-4">
                 <div className="flex items-center gap-5">
                   {/* <div className="flex items-center justify-center rounded-lg bg-black dark:bg-white">
@@ -140,14 +143,14 @@ export default async function DashboardPage({ searchParams }: PageProps) {
                     <h2 className="text-2xl text-black dark:text-white">
                       Account Settings
                     </h2>
-                    <p className="text-md mt-2 text-zinc-600 dark:text-zinc-400">
+                    <p className="text-md mt-2 text-slate-600 dark:text-slate-400">
                       View and manage your profile settings
                     </p>
                   </div>
                 </div>
                 <Link
                   href="/dashboard/profile"
-                  // className="inline-flex h-10 items-center justify-center rounded-lg bg-black px-6 text-sm font-medium text-white transition-colors hover:bg-zinc-800 dark:bg-white dark:text-black dark:hover:bg-zinc-200"
+                  // className="inline-flex h-10 items-center justify-center rounded-lg bg-black px-6 text-sm font-medium text-white transition-colors hover:bg-slate-800 dark:bg-white dark:text-black dark:hover:bg-slate-200"
                 >
                   <Button variant="secondary">
                     Go to Profile

@@ -27,12 +27,12 @@ export function SetupChecklist({ profile }: SetupChecklistProps) {
 
 
   if (!locked) return (
-    <section className="space-y-4 rounded-2xl border-2 border-slate-200 mb-8 p-8 dark:border-zinc-800">
+    <section className="space-y-4 rounded-2xl border-2 border-slate-200 mb-8 p-8 dark:border-slate-800">
       <div>
         <h2 className="text-2xl text-black dark:text-white">
           Setup Checklist
         </h2>
-        <p className="mt-3 mb-2 text-sm text-zinc-600 dark:text-zinc-400">
+        <p className="mt-3 mb-2 text-sm text-slate-600 dark:text-slate-400">
           Complete the following requirements before initiating your first check in
         </p>
       </div>
@@ -92,7 +92,7 @@ export function SetupChecklist({ profile }: SetupChecklistProps) {
     </section>
   );
 
-  return <section className="space-y-4 rounded-2xl border-2 border-slate-200 mb-8 p-8 dark:border-zinc-800">
+  return <section className="space-y-4 rounded-2xl border-2 border-slate-200 mb-8 p-8 dark:border-slate-800">
     Thank you for using YourCipherWill. Your benificiaries have been emailed with an encrypted link that destructs in 15 days. This account has now will be locked. Email support@yourcyberwill.com for any questions.
   </section>
 }
@@ -113,7 +113,7 @@ function ChecklistItem({
       className={`flex items-start gap-3 rounded-xl p-3 transition-colors ${
         done
           ? "border-emerald-200 bg-emerald-100 dark:border-emerald-900/50 dark:bg-emerald-950/20"
-          : "border-zinc-200 bg-slate-100 dark:border-zinc-700 dark:bg-zinc-900/50"
+          : "border-slate-200 bg-slate-100 dark:border-slate-700 dark:bg-slate-900/50"
       }`}
     >
       <div className="mt-0.5 flex-shrink-0">
@@ -123,7 +123,7 @@ function ChecklistItem({
             className="h-5 w-5 text-emerald-600 dark:text-emerald-400"
           />
         ) : (
-          <Circle className="h-5 w-5 text-zinc-400 dark:text-zinc-600" />
+          <Circle className="h-5 w-5 text-slate-400 dark:text-slate-600" />
         )}
       </div>
       <div className="flex-1">
@@ -131,7 +131,7 @@ function ChecklistItem({
           className={`text-sm font-medium ${
             done
               ? "text-emerald-900 dark:text-emerald-100"
-              : "text-zinc-900 dark:text-zinc-100"
+              : "text-slate-900 dark:text-slate-100"
           }`}
         >
           {title}
@@ -140,7 +140,7 @@ function ChecklistItem({
           className={`text-xs ${
             done
               ? "text-emerald-700 dark:text-emerald-200"
-              : "text-zinc-600 dark:text-zinc-400"
+              : "text-slate-600 dark:text-slate-400"
           }`}
         >
           {description}

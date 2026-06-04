@@ -1,10 +1,10 @@
 export const DEFAULT_RECIPIENT_EMAIL_TEMPLATE = `Hi {recipient_name},
 
-{owner_name}, who tagged you as a check-in recipient on yourcyberwill, has passed.
+{owner_name}, has tagged you as a benificiary for their digital assets in the YourCyberWill protocol. They were supposed to check in recently to confirm that they are doing okay, but they did not.
 
-They did not complete their scheduled check-in in time.
+Their vault is now opened to you with view-only access. Please check the vault for any important information or instructions they may have left for you. The link below will self destruct in 15 days.
 
-— yourcyberwill`;
+— YourCyberWill Team`
 
 export const RECIPIENT_EMAIL_PLACEHOLDERS = [
   "{recipient_name}",

@@ -24,13 +24,13 @@ export function VaultAttachment({ attachment }: { attachment: DecryptedFile }) {
   const isPdf = attachment.mimeType === "application/pdf";
 
   return (
-    <div className="space-y-3 rounded-lg border border-zinc-200 bg-white p-3 dark:border-zinc-800 dark:bg-zinc-900/60">
+    <div className="space-y-3 rounded-lg border border-slate-200 bg-white p-3 dark:border-slate-800 dark:bg-slate-900/60">
       <div className="flex flex-wrap items-center justify-between gap-2">
         <span className="text-sm font-medium">{attachment.name}</span>
         <a
           href={objectUrl}
           download={attachment.name}
-          className="text-sm text-zinc-600 underline-offset-2 hover:underline dark:text-zinc-400"
+          className="text-sm text-slate-600 underline-offset-2 hover:underline dark:text-slate-400"
         >
           Download
         </a>
@@ -51,12 +51,12 @@ export function VaultAttachment({ attachment }: { attachment: DecryptedFile }) {
         <iframe
           src={objectUrl}
           title={attachment.name}
-          className="h-64 w-full rounded-md border border-zinc-200 dark:border-zinc-700"
+          className="h-64 w-full rounded-md border border-slate-200 dark:border-slate-700"
         />
       )}
 
       {!isImage && !isAudio && !isPdf && (
-        <p className="text-xs text-zinc-500">
+        <p className="text-xs text-slate-500">
           Preview not available for this file type. Use download to open it.
         </p>
       )}

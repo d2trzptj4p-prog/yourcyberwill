@@ -2,6 +2,7 @@
 
 import { createClient } from "@/lib/supabase/client";
 import { Button } from "@/components/ui/button";
+import { GoogleLogoIcon } from "@phosphor-icons/react";
 
 export function GoogleSignInButton() {
   async function signInWithGoogle() {
@@ -21,9 +22,9 @@ export function GoogleSignInButton() {
     <Button
       type="button"
       onClick={signInWithGoogle}
-      className="flex h-12 w-full items-center justify-center gap-3 rounded-full border border-zinc-300 bg-white px-6 text-sm font-medium text-zinc-900 transition-colors hover:bg-zinc-50 dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-50 dark:hover:bg-zinc-800 sm:w-auto"
+      className="w-full h-14 gap-3 text-md"
     >
-      <GoogleIcon />
+      <GoogleLogoIcon className="size-6" />
       Continue with Google
     </Button>
   );
