@@ -45,6 +45,7 @@ function formatCountdown(ms: number): string {
 const emptyRecipientForm = { name: "", email: "" };
 
 export function CheckInSection() {
+
   const {
     checkIn,
     remainingMs,
@@ -62,6 +63,7 @@ export function CheckInSection() {
   const { tier, refresh: refreshTier } = useTierLimits();
   const [recipients, setRecipients] = useState<Recipient[]>([]);
   const [form, setForm] = useState(emptyRecipientForm);
+  const [notifyOnAdd, setNotifyOnAdd] = useState(false);
   const [emailTemplate, setEmailTemplate] = useState(
     DEFAULT_RECIPIENT_EMAIL_TEMPLATE,
   );
@@ -105,6 +107,8 @@ export function CheckInSection() {
     load();
   }, [load]);
 
+  
+
   useEffect(() => {
     if (recipientLinksVersion > 0) {
       load();
@@ -132,7 +136,25 @@ export function CheckInSection() {
           const data = await response.json();
           throw new Error(data.error ?? "Failed to add recipient");
         }
+
+        if (notifyOnAdd) {
+          try {
+            await fetch("/api/notify-beneficiary", {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({
+                recipientName: form.name,
+                recipientEmail: form.email,
+                ownerName: "A close connection",
+              }),
+            });
+          } catch (emailErr) {
+            console.error("Failed to send immediate notification email:", emailErr);
+          }
+        }
+
         setForm(emptyRecipientForm);
+        setNotifyOnAdd(false);
         setShowForm(false);
         if (unlocked) {
           setEncryptingNewRecipients(1);
@@ -240,13 +262,11 @@ export function CheckInSection() {
       return;
     }
 
-    // Show period selector on first check-in
     if (isFirstStart) {
       setShowPeriodSelector(true);
       return;
     }
 
-    // For subsequent check-ins, proceed directly
     setError(null);
     setCheckingIn(true);
     try {
@@ -500,6 +520,25 @@ export function CheckInSection() {
                 placeholder="jane@example.com"
               />
             </label>
+            
+            <div className="flex items-start gap-3 p-3 bg-slate-50 dark:bg-slate-900/50 rounded-xl border border-slate-200 dark:border-slate-700 mt-1">
+              <input
+                type="checkbox"
+                id="notifyOnAdd"
+                checked={notifyOnAdd}
+                onChange={(e) => setNotifyOnAdd(e.target.checked)}
+                className="mt-1 h-4 w-4 rounded border-slate-300 text-slate-950 focus:ring-slate-950 dark:border-slate-600 dark:bg-slate-800"
+              />
+              <div className="text-sm">
+                <label htmlFor="notifyOnAdd" className="font-medium text-slate-900 dark:text-slate-100 block cursor-pointer">
+                  Notify beneficiary they have been added
+                </label>
+                <p className="text-slate-500 dark:text-slate-400 text-xs mt-0.5">
+                  Sends a friendly email letting them know they are a trusted contact. Your secure vault contents remain fully hidden.
+                </p>
+              </div>
+            </div>
+
             <Button
               type="submit"
               disabled={saving}
@@ -511,9 +550,6 @@ export function CheckInSection() {
         )}
 
         {recipients.length === 0 ? (
-          // <p className="text-sm text-slate-500">
-          //   No recipients yet. Add at least one to start check-ins.
-          // </p>
           <></>
         ) : (
           <>
@@ -570,36 +606,24 @@ export function CheckInSection() {
         )}
 
         <div className="flex items-center gap-3 justify-center w-full">
-<Button
-          type="button"
-          onClick={handleCheckIn}
-          disabled={!canStartOrCheckIn || checkingIn}
-          title={
-            !canStartOrCheckIn
-              ? recipientCount < 1
-                ? "Add at least one recipient first"
-                : firstStartVaultBlocked
-                ? "Unlock or create your vault before starting check-ins"
+          <Button
+            type="button"
+            onClick={handleCheckIn}
+            disabled={!canStartOrCheckIn || checkingIn}
+            title={
+              !canStartOrCheckIn
+                ? recipientCount < 1
+                  ? "Add at least one recipient first"
+                  : firstStartVaultBlocked
+                  ? "Unlock or create your vault before starting check-ins"
+                  : undefined
                 : undefined
-              : undefined
-          }
-          className="inline-flex h-16 items-center justify-center rounded-full px-12 text-lg font-medium text-white transition-colors disabled:cursor-not-allowed disabled:opacity-40"
-        >
-          {/* <ClockCountdownIcon weight="fill" className="size-6 mr-1" /> */}
-          {checkingIn ? "Saving…" : buttonLabel}
-        </Button>
+            }
+            className="inline-flex h-16 items-center justify-center rounded-full px-12 text-lg font-medium text-white transition-colors disabled:cursor-not-allowed disabled:opacity-40"
+          >
+            {checkingIn ? "Saving…" : buttonLabel}
+          </Button>
         </div>
-
-        {/* {!canStartOrCheckIn && recipientCount < 1 && (
-          <p className="text-xs text-slate-500">
-            Add at least one recipient to enable check-ins.
-          </p>
-        )}
-        {!canStartOrCheckIn && firstStartVaultBlocked && (
-          <p className="text-xs text-amber-700 dark:text-amber-300">
-            Unlock your vault or create a vault password before starting check-ins.
-          </p>
-        )} */}
       </div>
 
       <CheckInPeriodSelector

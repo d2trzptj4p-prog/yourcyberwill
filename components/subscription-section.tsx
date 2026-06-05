@@ -117,11 +117,13 @@ export function SubscriptionSection() {
       {!subscription?.active && (
   <div className="mt-6 grid grid-cols-1 gap-1 text-sm sm:grid-cols-2 md:grid-cols-3">
     {[
-      { title: "250 MB Uploads", desc: "Single file limit (vs 15 MB on Free)" },
-      { title: "2 GB Total Storage", desc: "Secure cloud capacity (vs 50 MB on Free)" },
-      { title: "50 Secure Passwords", desc: "Vault credentials (vs 3 on Free)" },
-      { title: "50 Encrypted Notes", desc: "Text & instructions (vs 1 on Free)" },
-      { title: "20 Recipients", desc: "Designated loved ones (vs 2 on Free)" }
+     
+  { title: "150 MB Uploads", desc: "Single file limit (vs 15 MB on Free)" },
+  { title: "300 MB Total Storage", desc: "Secure cloud capacity (vs 30 MB on Free)" },
+  { title: "50 Secure Passwords", desc: "Vault credentials (vs 2 on Free)" },
+  { title: "50 Encrypted Notes", desc: "Text & instructions (vs 1 on Free)" },
+  { title: "20 Recipients", desc: "Designated loved ones (vs 1 on Free)" }
+
     ].map((item, index) => (
       <div 
         key={index} 

@@ -304,6 +304,9 @@ export default function Home() {
               <Link href="#faq">
                 <Button variant="ghost">FAQ</Button>
               </Link>
+              <Link href="/blogs">
+                <Button variant="ghost">Blog</Button>
+              </Link>
             </nav>
 
             <div className="flex items-center gap-2">

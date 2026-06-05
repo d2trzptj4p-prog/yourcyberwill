@@ -4,7 +4,7 @@ export default async function sitemap() {
   const baseUrl = 'https://www.yourcyberwill.com';
 
   // Base pages
-  const routes = ['', '/privacy', '/terms'].map((route) => ({
+  const routes = ['', '/privacy', '/terms', ['/blogs']].map((route) => ({
     url: `${baseUrl}${route}`,
     lastModified: new Date().toISOString().split('T')[0],
     changeFrequency: 'monthly',
