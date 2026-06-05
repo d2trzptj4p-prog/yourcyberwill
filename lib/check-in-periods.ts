@@ -1,5 +1,5 @@
 export const CHECK_IN_PERIODS = [
-  { label: "1 Minute (Testing)", days: 1, description: "For testing only" },
+  // { label: "1 Minute (Testing)", days: 1, description: "For testing only" },
   { label: "Every 2 Weeks", days: 14, description: "Frequent check-ins" },
   { label: "1 Month", days: 30, description: "Monthly check-ins" },
   { label: "3 Months", days: 90, description: "Quarterly check-ins" },
