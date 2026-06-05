@@ -216,6 +216,26 @@ const PRICING = [
 
 const FAQS = [
   {
+    question: "Do my beneficiaries need to know a secret password?",
+    answer:
+      "No, the whole point of YourCyberWill is to make it easy. Via a very intense encryption algorithm, on release day all your beneficiaries will need to do to access your vault is click the link that is automatically sent to them. Easy. Simple.",
+  },
+  {
+    question: "How do my beneficiaries receive access to my vault?",
+    answer:
+      "An encrypted link with a token is sent to their email upon release day which allows them to access your read-only vault and download your sensitive information. The link self destructs in 15 days. After that - it's gone.",
+  },
+  {
+    question: "How does the system know I am alive",
+    answer:
+      "You set a check in timer frequency (1 month, 3 month, a year), and after the limit is foregone and a danger buffer zone is passed, the vault access is shipped to ONLY your beneficiaries via an encrypted link. Checking in takes 2 seconds and resets your timer.",
+  },
+  {
+    question: "How do you prevent false sends to my beneficiaries?",
+    answer:
+      "We offer an extra buffer zone when your check in timer passes, and very frequently ping when your timer is low via email to ensure you're alive and for you to check in.",
+  },
+  {
     question: "Is YourCyberWill open source?",
     answer:
       "Yes, 100%. Our entire codebase, including the cryptographic vault architecture and automated trigger scripts, is publicly auditable on GitHub at https://github.com/d2trzptj4p-prog/yourcyberwill. We believe transparency is non-negotiable for digital inheritance.",
