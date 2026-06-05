@@ -403,6 +403,22 @@ export default function Home() {
       {/* ---------------------------------------------------------- */}
       <section id="demo-video" className="relative w-full py-20">
         <div className="mx-auto max-w-5xl px-6">
+          <h1 className="text-4xl text-slate-900 mb-12 w-full text-center">The problem</h1>
+          <motion.div
+            variants={fadeUp}
+            initial="hidden"
+            whileInView="show"
+            viewport={{ once: true, margin: "-100px" }}
+            className=""
+          >
+            <h1 className="mt-2 text-center text-2xl"> Traditional wills don't look after passwords, 2FA codes, crypto, seed phrases, important files, last messages. <br/> 
+            <br/>If something happens to you tomorrow, your life's work and digital assets are permanently locked away from your people.</h1>
+
+          </motion.div>
+          </div>
+          </section>
+      <section id="demo-video" className="relative w-full py-20">
+        <div className="mx-auto max-w-5xl px-6">
           <h1 className="text-4xl text-slate-900 mb-12 w-full text-center">How it works</h1>
           <motion.div
             variants={fadeUp}
