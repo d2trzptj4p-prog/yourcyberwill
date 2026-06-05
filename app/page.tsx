@@ -411,7 +411,7 @@ export default function Home() {
             viewport={{ once: true, margin: "-100px" }}
             className=""
           >
-            <h1 className="mt-2 text-center text-2xl"> Traditional wills don't look after passwords, 2FA codes, crypto, seed phrases, important files, last messages. <br/> 
+            <h1 className="mt-2 text-center text-2xl"> Traditional wills don't look after passwords, 2FA codes, crypto, seed phrases, important files, and last messages. <br/> 
             <br/>If something happens to you tomorrow, your life's work and digital assets are permanently locked away from your people.</h1>
 
           </motion.div>
