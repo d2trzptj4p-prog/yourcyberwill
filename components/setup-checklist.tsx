@@ -41,7 +41,7 @@ export function SetupChecklist({ profile }: SetupChecklistProps) {
         {/* Name Item */}
         <ChecklistItem
           title="Add your name (preferably real name)"
-          description={hasName ? `Your name: ${profile.full_name}` : "Complete your profile with your full name."}
+          description={hasName ? `Your name: ${profile.full_name}` : "Add your real name and refresh the page"}
           done={hasName}
           action={
             !hasName && (
