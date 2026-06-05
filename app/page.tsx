@@ -41,7 +41,7 @@ const TRUST_STATS = [
   { value: "AES-256", label: "Client-side encryption" },
   { value: "0", label: "Keys we can ever read" },
   { value: "100%", label: "Open source code" },
-  { value: "15-day", label: "Self-destructing links" },
+  { value: "15-day", label: "Self-destructing access links" },
 ] as const;
 
 const REVIEWS = [
